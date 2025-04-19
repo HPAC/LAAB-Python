@@ -1,3 +1,0 @@
-algorithm;m;k;n;C;cs_time
-gemm_explicit_noup;3000;3000;3000;5.353470e-01;4.759000e-03
-gemm_implicit_noup;3000;3000;3000;5.353470e-01;4.759000e-03
