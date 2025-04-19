@@ -3,6 +3,7 @@
 ### Source Modules
 
 ```
+cd src/
 source modules.umea.sh
 ```
 
