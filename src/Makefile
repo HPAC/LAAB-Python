@@ -17,22 +17,25 @@ run_fblas:
 	LD_PRELOAD=./obtrace.so ./sgemm 3000 3000 3000
 
 run_scipy:
-	LD_PRELOAD=./obtrace.so python gemm_scipy.py
+	LD_PRELOAD=./obtrace.so taskset -c 0 python gemm_scipy.py
 
 run_torch:
-	LD_PRELOAD=./obtrace.so python gemm_torch.py
+	LD_PRELOAD=./obtrace.so taskset -c 0 python gemm_torch.py
 
 run_tf:
-	LD_PRELOAD=./obtrace.so python gemm_tf.py
+	LD_PRELOAD=./obtrace.so taskset -c 0 python gemm_tf.py
+
+run_jax:
+	LD_PRELOAD=./obtrace.so taskset -c 0 python gemm_jax.py
 
 run_np:
-	LD_PRELOAD=./obtrace.so python gemm_np.py
+	LD_PRELOAD=./obtrace.so taskset -c 0 python gemm_np.py
 
 run_nn:
-	LD_PRELOAD=./obtrace.so python nn_torch.py
+	LD_PRELOAD=./obtrace.so taskset -c 0 python nn_torch.py
 
 run_gls:
-	LD_PRELOAD=./obtrace.so python gls.py
+	LD_PRELOAD=./obtrace.so taskset -c 0 python gls.py
 
 run_gpt:
 	LD_PRELOAD=./obtrace.so python gpt.py
