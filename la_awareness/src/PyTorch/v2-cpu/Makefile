@@ -1,9 +1,13 @@
+.PHONY: run
 
-PREFIX = taskset -c 0
-REPS = 3
-N = 3000
+# Uncomment the following  if you want to run this makefile independently
+# LAAB_PREFIX = taskset -c 0
+# LAAB_REPS = 3
+# LAAB_N = 3000
+
 
 SCRIPTS = \
+	sgemm.py \
 	cse_addition.py \
 	cse_matmul_paranthesis.py \
 	cse_matmul_no_paranthesis.py \
@@ -21,9 +25,15 @@ SCRIPTS = \
 	cm_partial_op_sum.py \
 	cm_partial_op_prod.py \
 
-run: $(SCRIPTS:.py=.run)
+all: run_c run_py
+
+run_c:
+	LAAB_REPS=$(LAAB_REPS) LAAB_N=$(LAAB_N) LAAB_PREFIX='$(LAAB_PREFIX)' $(MAKE) -C ../../C/
+	$(MAKE) -C ../../C/ clean
+
+run_py: $(SCRIPTS:.py=.run)
 
 # Pattern rule: how to run each script
 %.run: %.py
-	LAAB_REPS=$(REPS) LAAB_N=$(N) $(PREFIX) python $<
+	LAAB_REPS=$(LAAB_REPS) LAAB_N=$(LAAB_N) $(LAAB_PREFIX) python $< 
 	
