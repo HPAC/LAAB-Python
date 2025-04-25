@@ -38,7 +38,8 @@ if __name__ == "__main__":
     REPS = int(os.environ.get("LAAB_REPS", 3))
     DTYPE = torch.float32
 
-    A = torch.tril(torch.randn([N, N], dtype=DTYPE))
+    A = torch.randn([N, N], dtype=DTYPE)
+    A = torch.diag(torch.diag(A,1),1)+torch.diag(torch.diag(A))+torch.diag(torch.diag(A,-1),-1)
     B = torch.randn([N, N], dtype=DTYPE)
    
     DTYPE = np.float32

@@ -32,8 +32,7 @@ if __name__ == "__main__":
     REPS = int(os.environ.get("LAAB_REPS", 3))
     DTYPE = torch.float32
 
-    A = torch.tril(torch.randn([N, N], dtype=DTYPE))
-    B = torch.randn([N, N], dtype=DTYPE)
+    A = torch.randn([N, N], dtype=DTYPE)
    
     DTYPE = np.float32
     A_opt = np.random.randn(N,N).astype(DTYPE)

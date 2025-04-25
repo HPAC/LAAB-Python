@@ -1,43 +1,45 @@
-import torch
+import tensorflow as tf
 import os
 import time
 
 
-#Sets the number of threads used for intraop parallelism on CPU.
-torch.set_num_threads(1)
-
-#Problem size
-n = 3000
-reps = 3
-DTYPE = torch.float32
-
-
-@torch.jit.script
-def mc_cse_non_optimized(A,B):
-    ret = torch.t(torch.t(A)@B)@(torch.t(A)@B)    
+@tf.function
+def actual(A,B):
+    ret = tf.transpose(tf.transpose(A)@B)@(tf.transpose(A)@B)    
     return ret
 
-@torch.jit.script
-def mc_cse_optimized(A,B):
-    tmp = torch.t(A)@B
-    ret = torch.t(tmp)@tmp
+@tf.function
+def optimized(A,B):
+    tmp = tf.transpose(A)@B
+    ret = tf.transpose(tmp)@tmp
     return ret
 
 
-A = torch.randn([n, n], dtype=DTYPE)
-B = torch.randn([n, n], dtype=DTYPE)
+if __name__ == "__main__":
+
+    #Set threads
+    tf.config.threading.set_inter_op_parallelism_threads(1)
+    tf.config.threading.set_intra_op_parallelism_threads(1)
+
+    #Problem size
+    n = int(os.environ.get("LAAB_N", 3000))
+    reps = int(os.environ.get("LAAB_REPS", 3))
+    DTYPE = tf.float32
+    
+    A = tf.random.normal([n, n], dtype=DTYPE)
+    B = tf.random.normal([n, n], dtype=DTYPE)
 
 
-for i in range(reps):
-   start = time.perf_counter()
-   ret = mc_cse_non_optimized(A,B)
-   end = time.perf_counter()
-   elapsed = end-start
+    for i in range(reps):
+        start = time.perf_counter()
+        ret = actual(A,B)
+        end = time.perf_counter()
+        elapsed_actual = end-start
 
-   start = time.perf_counter()
-   ret = mc_cse_optimized(A,B)
-   end = time.perf_counter()
-   optimized = end-start
+        start = time.perf_counter()
+        ret = optimized(A,B)
+        end = time.perf_counter()
+        elapsed_optimized = end-start
 
 
-   print("PyTorch | cse_matmul_paranthesis | elapsed={:.5f} s | optimized={:.5f} s".format(elapsed,optimized))  
+        print("[LAAB] TensorFlow | cse_matmul_paranthesis | optimized={:.5f} s | actual={:.5f} s".format(elapsed_optimized, elapsed_actual))  

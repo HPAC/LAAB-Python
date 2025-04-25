@@ -1,43 +1,43 @@
-import torch
+import tensorflow as tf
 import os
 import time
 
-
-#Sets the number of threads used for intraop parallelism on CPU.
-torch.set_num_threads(1)
-
-#Problem size
-n = 3000
-reps = 3
-DTYPE = torch.float32
-
-
-@torch.jit.script
-def actual_expr(A,B):
-    ret = torch.t(A)@B + torch.t(A)@B
+@tf.function
+def actual(A,B):
+    ret = tf.transpose(A)@B + tf.transpose(A)@B
     return ret
 
-@torch.jit.script
-def simplified_expr(A,B):
-    tmp = torch.t(A)@B
+@tf.function
+def optimized(A,B):
+    tmp = tf.transpose(A)@B
     ret = tmp + tmp
     return ret
 
+if __name__ == "__main__":
 
-A = torch.randn([n, n], dtype=DTYPE)
-B = torch.randn([n, n], dtype=DTYPE)
+    #Set threads
+    tf.config.threading.set_inter_op_parallelism_threads(1)
+    tf.config.threading.set_intra_op_parallelism_threads(1)
 
-
-for i in range(reps):
-   start = time.perf_counter()
-   ret1 = actual_expr(A,B)
-   end = time.perf_counter()
-   elapsed = end-start
-
-   start = time.perf_counter()
-   ret1 = simplified_expr(A,B)
-   end = time.perf_counter()
-   optimized = end-start
+    #Problem size
+    n = int(os.environ.get("LAAB_N", 3000))
+    reps = int(os.environ.get("LAAB_REPS", 3))
+    DTYPE = tf.float32
+    
+    A = tf.random.normal([n, n], dtype=DTYPE)
+    B = tf.random.normal([n, n], dtype=DTYPE)
 
 
-   print("PyTorch | cse_addition | elapsed={:.5f} s | optimized={:.5f} s".format(elapsed,optimized))  
+    for i in range(reps):
+        start = time.perf_counter()
+        ret1 = actual(A,B)
+        end = time.perf_counter()
+        elapsed_actual = end-start
+
+        start = time.perf_counter()
+        ret1 = optimized(A,B)
+        end = time.perf_counter()
+        elapsed_optimized = end-start
+
+
+        print("[LAAB] TensorFlow | cse_addition | optimized={:.5f} s | actual={:.5f} s".format(elapsed_optimized,elapsed_actual))  
