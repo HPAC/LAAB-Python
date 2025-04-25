@@ -1,4 +1,4 @@
-## LAAB-Python | LA Awareness-CPU | PyTorch/2.1.2-foss-2023a | kebnakaise
+## LAAB-Python | LA Awareness-CPU | {{ eb_name }} | {{ system }}
 
 This report evaluates whether the software build performs operations equivalent to those of optimized math libraries (e.g., OpenBLAS, MKL), and whether it leverages linear algebra techniques to accelerate CPU computations.  Unless stated otherwise, all benchmarks use matrices of size $3000 \times 3000$ and are executed on a single CPU core. 
 
@@ -8,9 +8,9 @@ PyTorch's matrix multiplication - using the `@` operator and the `torch.linalg.m
 
 ||Call  |  time (s)  | 
 |----|------|------------|
-|$A^TB$|`t(A)@B`| 0.4337 :white_check_mark:|
-|$"$|`linalg.matmul(t(A),B)` | 0.4327 :white_check_mark: |
-|**Reference** |`sgemm`| **0.4230**|
+|$A^TB$|`t(A)@B`| {{ sgemm_actual }} {{ sgemm_actual_result }}|
+|$"$|`linalg.matmul(t(A),B)` | {{ sgemm_linalg_matmul }} {{ sgemm_linalg_matmul_result }} |
+|**Reference** |`sgemm`| **{{ sgemm_optimized }}**|
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
 
@@ -24,8 +24,8 @@ PyTorch's matrix multiplication - using the `@` operator and the `torch.linalg.m
 
 |Expr |Call |time (s) |
 |-----|-----|----------|
-|$E$ |`t(A)@B + t(A)@B` | 0.4493 :white_check_mark:| 
-|**Reference**| `2*(t(A)@B)`| **0.4480**|
+|$E$ |`t(A)@B + t(A)@B` | {{ cse_addition_actual }} {{ cse_addition_actual_result }}| 
+|**Reference**| `2*(t(A)@B)`| **{{ cse_addition_optimized }}**|
 
   b) **Repeated in multiplication**
 
@@ -33,9 +33,9 @@ PyTorch's matrix multiplication - using the `@` operator and the `torch.linalg.m
 
 |Expr|Call | time (s) |
 |-----|-----|----------|
-|$E_1$|`t(t(A)@B)@(t(A)@B)`| 0.8696 :white_check_mark: |
-|$E_2$|`t(t(A)@B)@t(A)@B`| 1.3054  :x: | 
-|**Reference**| `S=t(A)@B; t(S)@S`| **0.8696**|
+|$E_1$|`t(t(A)@B)@(t(A)@B)`| {{ cse_matmul_paranthesis_actual }} {{ cse_matmul_paranthesis_actual_result }} |
+|$E_2$|`t(t(A)@B)@t(A)@B`| {{ cse_matmul_no_paranthesis_actual }}  {{ cse_matmul_no_paranthesis_actual_result }} | 
+|**Reference**| `S=t(A)@B; t(S)@S`| **{{ cse_matmul_paranthesis_optimized }}**|
 
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
@@ -50,9 +50,9 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
 |Expr|Call| time (s)|
 |----|----|---------|
-|$H^THx$|`t(H)@H@x`| 0.4371 :x: | 
-|$"$|`linalg.multi_dot([t(H), H, x])`| 0.0058 :white_check_mark: | 
-|**Reference**| `t(H)@(H@x)`| **0.0050**|
+|$H^THx$|`t(H)@H@x`| {{ matchain_rtol_actual }} {{ matchain_rtol_actual_result }} | 
+|$"$|`linalg.multi_dot([t(H), H, x])`| {{ matchain_rtol_linalg_multidot }} {{ matchain_rtol_linalg_multidot_result }} | 
+|**Reference**| `t(H)@(H@x)`| **{{ matchain_rtol_optimized }}**|
 
   b) **Left to right**:
 
@@ -60,9 +60,9 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
 |Expr|Call | time (s)|
 |----|-----|---------|
-|$y^TH^TH$|`t(y)@t(H)@H`| 0.0051 :white_check_mark: | 
-|$"$|`linalg.multi_dot([t(y), t(H), H])`| 0.0051 :white_check_mark: | 
-|**Reference**| `(t(y)@t(H))@H`| **0.0051**|
+|$y^TH^TH$|`t(y)@t(H)@H`| {{ matchain_ltor_actual }} {{matchain_ltor_actual_result}} | 
+|$"$|`linalg.multi_dot([t(y), t(H), H])`| {{ matchain_ltor_linalg_multidot }} {{ matchain_ltor_linalg_multidot_result }} | 
+|**Reference**| `(t(y)@t(H))@H`| **{{ matchain_ltor_optimized }}**|
 
 
   c) **Mixed**:
@@ -71,9 +71,9 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
 |Expr|Call| time (s) |
 |----|----|-----------|
-|$H^Tyx^TH$|`t(H)@y@t(x)@H`| 0.4522 :x: | 
-|$"$|`linalg.multi_dot([t(H), y, t(x), H])`| 0.0211 :white_check_mark: | 
-|**Reference**| `(t(H)@y)@(t(x)@H)`| **0.0208**|
+|$H^Tyx^TH$|`t(H)@y@t(x)@H`| {{ matchain_mixed_actual }} {{ matchain_mixed_actual_result }} | 
+|$"$|`linalg.multi_dot([t(H), y, t(x), H])`| {{ matchain_mixed_linalg_multidot }} {{ matchain_mixed_linalg_multidot_result }} | 
+|**Reference**| `(t(H)@y)@(t(x)@H)`| **{{ matchain_mixed_optimized }}**|
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
 
@@ -87,9 +87,9 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
 |Expr|Call |  time (s)  | 
 |----|-----|------------|
-|$AB$|`A@B`| 0.4321 :x: |
-|$"$|`linalg.matmul(A,B)`| 0.4338 :x:  |
-|**Reference** |`trmm`| **0.2180**|
+|$AB$|`A@B`| {{ mp_trmm_actual }} {{ mp_trmm_actual_result }} |
+|$"$|`linalg.matmul(A,B)`| {{ mp_trmm_linalg_matmul }} {{ mp_trmm_linalg_matmul_result }}  |
+|**Reference** |`trmm`| **{{ mp_trmm_optimized }}**|
 
   b) **SYRK**
 
@@ -97,9 +97,9 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
 |Expr|Call| time (s)  | 
 |----|----|------------|
-|$AB$|`A@B`| 0.4318 :x: |
-|$"$|`linalg.matmul(A,B)`| 0.4339 :x:  |
-|**Reference** |`syrk`| **0.2247**|
+|$AB$|`A@B`| {{ mp_syrk_actual }} {{ mp_syrk_actual_result }} |
+|$"$|`linalg.matmul(A,B)`| {{ mp_syrk_linalg_matmul }} {{ mp_syrk_linalg_matmul_result }}  |
+|**Reference** |`syrk`| **{{ mp_syrk_optimized }}**|
 
   c) **Tri-diagonal**
 
@@ -107,9 +107,9 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
 |Expr|Call|  time (s)  | 
 |----|----|-------------|
-|$AB$|`A@B`| 0.4326 :x: |
-|$"$|`linalg.matmul(A,B)`| 0.4328 :x:  |
-|**Reference** |`csr(A)@B`| **0.0358**|
+|$AB$|`A@B`| {{ mp_tridiag_actual }} {{ mp_tridiag_actual_result }} |
+|$"$|`linalg.matmul(A,B)`| {{ mp_tridiag_linalg_matmul }} {{ mp_tridiag_linalg_matmul_result }}  |
+|**Reference** |`csr(A)@B`| **{{ mp_tridiag_optimized }}**|
 
   d) **Diagonal**
 
@@ -117,9 +117,9 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
 |Expr|Call|  time (s)  | 
 |----|----|------------|
-|$AB$|`A@B`| 0.4328 :x: |
-|$"$|`linalg.matmul(A,B)`| 0.4328 :x:  |
-|**Reference** |`csr(A)@B`| **0.0313**|
+|$AB$|`A@B`| {{ mp_diag_actual }} {{ mp_diag_actual_result }} |
+|$"$|`linalg.matmul(A,B)`| {{ mp_diag_linalg_matmul }} {{ mp_diag_linalg_matmul_result }}  |
+|**Reference** |`csr(A)@B`| **{{ mp_diag_optimized }}**|
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
 
@@ -133,15 +133,15 @@ The input expression is $E_1 = AB+AC$. This expression requires two $\mathcal{O}
 
 |Expr|Call| time (s)|
 |----|---|----------|
-|$E_1$|`A@B + A@C`| 0.8814 :x:| 
-|**Reference**|`A@(B+C)`|**0.4472**|
+|$E_1$|`A@B + A@C`| {{ am_distributivity1_actual }} {{ am_distributivity1_actual_result }}| 
+|**Reference**|`A@(B+C)`|**{{ am_distributivity1_optimized }}**|
 
 Now, the input expression is $E_2 = (A - H^TH)x$, which involves one $\mathcal{O}(n^3)$ matrix multiplication. This expression can be rewritten as $Ax - H^T(Hx)$, thereby avoiding the $\mathcal{O}(n^3)$ matrix multiplcation. 
 
 |Expr|Call| time (s)|
 |----|---|----------|
-|$E_2$|`(A - t(H)@H)@x`| 0.4519 :x:| 
-|**Reference**|`A@x - t(H)@(H@x)`|**0.0088**|
+|$E_2$|`(A - t(H)@H)@x`| {{ am_distributivity2_actual }} {{ am_distributivity2_actual_result }}| 
+|**Reference**|`A@x - t(H)@(H@x)`|**{{ am_distributivity2_optimized }}**|
 
 
   b) **Identifying the blocked matrix structure**:
@@ -158,9 +158,9 @@ $$
 
 |Expr|Call| time (s)|
 |----|---|----------|
-|$AB$|`A@B`| 0.4329 :x: | 
-|$"$|`linalg.matmul(A,B)` | 0.4329 :x: | 
-|**Reference**|`blocked matrix multiply`|**0.2366**|
+|$AB$|`A@B`| {{ am_blocked_actual }} {{ am_blocked_actual_result }} | 
+|$"$|`linalg.matmul(A,B)` | {{ am_blocked_linalg_matmul }} {{ am_blocked_linalg_matmul_result }} | 
+|**Reference**|`blocked matrix multiply`|**{{ am_blocked_optimized }}**|
 
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
@@ -175,8 +175,8 @@ Some operations, when moved around, can result in improved performance.
 
 ||Call| time (s)|
 |----|------|----------|
-||`for i in range(3):` <br> `   A@B + tensordot(V[i],t(V[i])`| 0.4659  :white_check_mark: |
-|**Reference**|`S=A@B;` <br> `for i in range(3):` <br>`   S+tensordot(V[i],t(V[i]) `|**0.4637**| 
+||`for i in range(3):` <br> `   A@B + tensordot(V[i],t(V[i])`| {{ cm_loops_actual }}  {{ cm_loops_actual_result }} |
+|**Reference**|`S=A@B;` <br> `for i in range(3):` <br>`   S+tensordot(V[i],t(V[i]) `|**{{ cm_loops_optimized }}**| 
 
   b) **Identifying partial operand access**:
 
@@ -184,17 +184,18 @@ The output of the expression `(A+B)[2,2]` requires only single element of both t
 
 ||Call | time (s)|
 |----|-----|---------|
-||`(A+B)[2,2]`| 0.0124 :x: | 
-|**Reference**|`A[2]+B[2]`|**0.0017**|
+||`(A+B)[2,2]`| {{ cm_partial_op_sum_actual }} {{ cm_partial_op_sum_actual_result }} | 
+|**Reference**|`A[2]+B[2]`|**{{ cm_partial_op_sum_optimized }}**|
 
 Similarly, the output of the expression `(A@B)[2,2]` also requires only single element of both the matrices. Here, the explicit multiplication of the full matrices can be avoided. 
 
 ||Call | time (s)|
 |----|-----|---------|
-||`(A@B)[2,2]`| 0.4312 :x: | 
-|**Reference**|`dot(A[2,:],B[:,2])`|**0.0019**|
+||`(A@B)[2,2]`| {{ cm_partial_op_prod_actual }} {{ cm_partial_op_prod_actual_result }} | 
+|**Reference**|`dot(A[2,:],B[:,2])`|**{{ cm_partial_op_prod_optimized }}**|
 
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
 
-## Overall Score: 7/17
+## Overall Score: {{ score }}/{{ total }}
+

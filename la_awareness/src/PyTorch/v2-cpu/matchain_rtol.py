@@ -51,4 +51,4 @@ if __name__ == "__main__":
         
         elapsed_optimized = end-start
         
-        print("[LAAB] PyTorch | matchain_ltor | optimized={:.5f} s | actual={:.5f} s | linalg_multidot={:.5f} s".format(elapsed_optimized,elapsed_actual,elapsed_multidot))  
+        print("[LAAB] PyTorch | matchain_rtol | optimized={:.5f} s | actual={:.5f} s | linalg_multidot={:.5f} s".format(elapsed_optimized,elapsed_actual,elapsed_multidot))  

@@ -8,6 +8,11 @@ def actual(A,B):
     return ret
 
 @torch.jit.script
+def linalg_matmul(A,B):
+    ret = torch.linalg.matmul(A,B)
+    return ret
+
+@torch.jit.script
 def optimized(A1,A2,B1,B2):
     ret = torch.cat((A1@B1, A2@B2),dim=0)
     return ret
@@ -38,8 +43,13 @@ if __name__ == "__main__":
         elapsed_actual = end-start
         
         start = time.perf_counter()
+        ret = linalg_matmul(A,B)
+        end = time.perf_counter()
+        elapsed_matmul = end-start
+        
+        start = time.perf_counter()
         ret1 = optimized(A1,A2,B1,B2)
         end = time.perf_counter()
         elapsed_optimized = end-start    
 
-        print("[LAAB] PyTorch | am_blocked | optimized={:.5f} s | actual={:.5f} s".format(elapsed_optimized,elapsed_actual))
+        print("[LAAB] PyTorch | am_blocked | optimized={:.5f} s | actual={:.5f} s  | linalg_matmul={:.5f} s".format(elapsed_optimized, elapsed_actual, elapsed_matmul))

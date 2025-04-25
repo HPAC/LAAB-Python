@@ -8,6 +8,11 @@ def actual(A,B):
     ret = A@B
     return ret
 
+@torch.jit.script
+def linalg_matmul(A,B):
+    ret = torch.linalg.matmul(A,B)
+    return ret
+
 if __name__ == "__main__":
 
 
@@ -28,4 +33,10 @@ if __name__ == "__main__":
         ret = actual(A,B)
         end = time.perf_counter()
         elapsed_actual = end-start 
-        print("[LAAB] PyTorch | sgemm | actual={:.5f} s".format(elapsed_actual)) 
+        
+        start = time.perf_counter()
+        ret = linalg_matmul(A,B)
+        end = time.perf_counter()
+        elapsed_matmul = end-start
+        
+        print("[LAAB] PyTorch | sgemm | actual={:.5f} s | linalg_matmul={:.5f} s".format(elapsed_actual, elapsed_matmul)) 
