@@ -3,6 +3,10 @@ import sys
 import statistics
 from jinja2 import Template
 
+
+#def evaluate(value,ref_value, exp_name):
+#    pass    
+
 def compare(value, ref_value):
     mean_value = statistics.mean(value[1:])
     mean_ref_value = statistics.mean(ref_value[1:])
@@ -43,14 +47,17 @@ if __name__ == "__main__":
         "system": system,
     }
     
-
-    
+ 
     # Read the data file
     data = []
+    cpu_model = ""
     with open(data_file, "r") as f:
         for line in f:
             if line.startswith("[LAAB]"):
                 data.append(line.split("[LAAB]")[1].strip().split("|")[1:])
+            if line.startswith("Model name:"):
+                cpu_model = line.split("Model name:")[1].strip()
+                inject["cpu_model"] = cpu_model
 
     ## Example data:
         # [' sgemm ', ' optimized=0.462 s']
