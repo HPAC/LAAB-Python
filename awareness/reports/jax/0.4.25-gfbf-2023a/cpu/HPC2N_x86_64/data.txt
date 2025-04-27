@@ -1,0 +1,131 @@
+Model name:                           AMD EPYC 9454 48-Core Processor
+LAAB_REPS=5 LAAB_N=3000 LAAB_PREFIX='' LD_BLAS=-lopenblas /usr/bin/make -C ../../C/ run
+gcc -O3  sgemm.c -c
+gcc sgemm.o -o sgemm -lopenblas
+gcc -O3  ssyrk.c -c
+gcc ssyrk.o -o ssyrk -lopenblas
+gcc -O3  strmm.c -c
+gcc strmm.o -o strmm -lopenblas
+gcc -O3  stridiagmm.c -c -fopenmp
+gcc stridiagmm.o -o stridiagmm -fopenmp
+REP=5  ./sgemm 3000 3000 3000
+[LAAB] C | sgemm | optimized=0.483 s
+[LAAB] C | sgemm | optimized=0.462 s
+[LAAB] C | sgemm | optimized=0.462 s
+[LAAB] C | sgemm | optimized=0.462 s
+[LAAB] C | sgemm | optimized=0.463 s
+REP=5  ./ssyrk 3000 3000
+[LAAB] C | mp_syrk | optimized=0.241 s
+[LAAB] C | mp_syrk | optimized=0.239 s
+[LAAB] C | mp_syrk | optimized=0.240 s
+[LAAB] C | mp_syrk | optimized=0.240 s
+[LAAB] C | mp_syrk | optimized=0.240 s
+REP=5  ./strmm 3000 3000
+[LAAB] C | mp_trmm | optimized=0.232 s
+[LAAB] C | mp_trmm | optimized=0.250 s
+[LAAB] C | mp_trmm | optimized=0.231 s
+[LAAB] C | mp_trmm | optimized=0.231 s
+[LAAB] C | mp_trmm | optimized=0.231 s
+REP=5  ./stridiagmm 3000 3000
+[LAAB] C | mp_tridiag | optimized=0.004647 s
+[LAAB] C | mp_tridiag | optimized=0.004508 s
+[LAAB] C | mp_tridiag | optimized=0.004492 s
+[LAAB] C | mp_tridiag | optimized=0.004457 s
+[LAAB] C | mp_tridiag | optimized=0.004433 s
+rm *.o sgemm ssyrk strmm stridiagmm
+LAAB_REPS=5 LAAB_N=3000  python sgemm.py 
+[LAAB] Jax | sgemm | actual=0.52232 s | jnp_matmul=0.52267 s
+[LAAB] Jax | sgemm | actual=0.50604 s | jnp_matmul=0.51126 s
+[LAAB] Jax | sgemm | actual=0.49067 s | jnp_matmul=0.49026 s
+[LAAB] Jax | sgemm | actual=0.50032 s | jnp_matmul=0.49556 s
+[LAAB] Jax | sgemm | actual=0.48996 s | jnp_matmul=0.49015 s
+LAAB_REPS=5 LAAB_N=3000  python cse_addition.py 
+[LAAB] Jax | cse_addition | optimized=1.17184 s | actual=1.16409 s
+[LAAB] Jax | cse_addition | optimized=1.11149 s | actual=1.12333 s
+[LAAB] Jax | cse_addition | optimized=1.12403 s | actual=1.10587 s
+[LAAB] Jax | cse_addition | optimized=1.12417 s | actual=1.12069 s
+[LAAB] Jax | cse_addition | optimized=1.11933 s | actual=1.10032 s
+LAAB_REPS=5 LAAB_N=3000  python cse_matmul_paranthesis.py 
+[LAAB] Jax | cse_matmul_paranthesis | optimized=1.18709 s | actual=1.68488 s
+[LAAB] Jax | cse_matmul_paranthesis | optimized=1.11053 s | actual=1.62123 s
+[LAAB] Jax | cse_matmul_paranthesis | optimized=1.10391 s | actual=1.64241 s
+[LAAB] Jax | cse_matmul_paranthesis | optimized=1.13007 s | actual=1.59686 s
+[LAAB] Jax | cse_matmul_paranthesis | optimized=1.10981 s | actual=1.60578 s
+LAAB_REPS=5 LAAB_N=3000  python cse_matmul_no_paranthesis.py 
+[LAAB] Jax | cse_matmul_no_paranthesis | optimized=1.15683 s | actual=1.64210 s
+[LAAB] Jax | cse_matmul_no_paranthesis | optimized=1.08970 s | actual=1.55648 s
+[LAAB] Jax | cse_matmul_no_paranthesis | optimized=1.11773 s | actual=1.52886 s
+[LAAB] Jax | cse_matmul_no_paranthesis | optimized=1.09054 s | actual=1.53557 s
+[LAAB] Jax | cse_matmul_no_paranthesis | optimized=1.09031 s | actual=1.55815 s
+LAAB_REPS=5 LAAB_N=3000  python matchain_ltor.py 
+[LAAB] Jax | matchain_ltor | optimized=0.03140 s | actual=0.03180 s | linalg_multidot=0.03272 s
+[LAAB] Jax | matchain_ltor | optimized=0.01013 s | actual=0.01023 s | linalg_multidot=0.01015 s
+[LAAB] Jax | matchain_ltor | optimized=0.01006 s | actual=0.01011 s | linalg_multidot=0.01016 s
+[LAAB] Jax | matchain_ltor | optimized=0.01006 s | actual=0.01007 s | linalg_multidot=0.01006 s
+[LAAB] Jax | matchain_ltor | optimized=0.01006 s | actual=0.01006 s | linalg_multidot=0.01007 s
+LAAB_REPS=5 LAAB_N=3000  python matchain_rtol.py 
+[LAAB] Jax | matchain_rtol | optimized=0.03772 s | actual=0.59652 s | linalg_multidot=0.03953 s
+[LAAB] Jax | matchain_rtol | optimized=0.01193 s | actual=0.56303 s | linalg_multidot=0.01219 s
+[LAAB] Jax | matchain_rtol | optimized=0.01193 s | actual=0.54790 s | linalg_multidot=0.01203 s
+[LAAB] Jax | matchain_rtol | optimized=0.01190 s | actual=0.54816 s | linalg_multidot=0.01202 s
+[LAAB] Jax | matchain_rtol | optimized=0.01187 s | actual=0.56742 s | linalg_multidot=0.01203 s
+LAAB_REPS=5 LAAB_N=3000  python matchain_mixed.py 
+[LAAB] Jax | matchain_mixed | optimized=0.05211 s | actual=0.55310 s | linalg_multidot=0.05255 s
+[LAAB] Jax | matchain_mixed | optimized=0.02588 s | actual=0.51505 s | linalg_multidot=0.03380 s
+[LAAB] Jax | matchain_mixed | optimized=0.02591 s | actual=0.51508 s | linalg_multidot=0.02594 s
+[LAAB] Jax | matchain_mixed | optimized=0.02593 s | actual=0.51499 s | linalg_multidot=0.02587 s
+[LAAB] Jax | matchain_mixed | optimized=0.02614 s | actual=0.53501 s | linalg_multidot=0.02579 s
+LAAB_REPS=5 LAAB_N=3000  python mp_trmm.py 
+[LAAB] Jax | mp_trmm | actual=0.52121 s | jnp_matmul=0.52151 s
+[LAAB] Jax | mp_trmm | actual=0.50282 s | jnp_matmul=0.51204 s
+[LAAB] Jax | mp_trmm | actual=0.48937 s | jnp_matmul=0.48866 s
+[LAAB] Jax | mp_trmm | actual=0.49487 s | jnp_matmul=0.49800 s
+[LAAB] Jax | mp_trmm | actual=0.48849 s | jnp_matmul=0.48886 s
+LAAB_REPS=5 LAAB_N=3000  python mp_syrk.py 
+[LAAB] Jax | mp_syrk | actual=0.51865 s | jnp_matmul=0.51929 s
+[LAAB] Jax | mp_syrk | actual=0.49493 s | jnp_matmul=0.48652 s
+[LAAB] Jax | mp_syrk | actual=0.48657 s | jnp_matmul=0.48634 s
+[LAAB] Jax | mp_syrk | actual=0.48579 s | jnp_matmul=0.51370 s
+[LAAB] Jax | mp_syrk | actual=0.48596 s | jnp_matmul=0.48632 s
+LAAB_REPS=5 LAAB_N=3000  python mp_tridiag.py 
+[LAAB] Jax | mp_tridiag | actual=0.52127 s | jnp_matmul=0.55325 s
+[LAAB] Jax | mp_tridiag | actual=0.49519 s | jnp_matmul=0.48901 s
+[LAAB] Jax | mp_tridiag | actual=0.48765 s | jnp_matmul=0.48809 s
+[LAAB] Jax | mp_tridiag | actual=0.49876 s | jnp_matmul=0.49308 s
+[LAAB] Jax | mp_tridiag | actual=0.48897 s | jnp_matmul=0.48863 s
+LAAB_REPS=5 LAAB_N=3000  python am_distributivity1.py 
+[LAAB] Jax | am_distributivity1 | optimized=0.55692 s | actual=1.04174 s
+[LAAB] Jax | am_distributivity1 | optimized=0.50554 s | actual=1.01774 s
+[LAAB] Jax | am_distributivity1 | optimized=0.51559 s | actual=0.98363 s
+[LAAB] Jax | am_distributivity1 | optimized=0.50579 s | actual=1.01724 s
+[LAAB] Jax | am_distributivity1 | optimized=0.51738 s | actual=1.00518 s
+LAAB_REPS=5 LAAB_N=3000  python am_distributivity2.py 
+[LAAB] Jax | am_distributivity2 | optimized=0.04156 s | actual=0.59195 s
+[LAAB] Jax | am_distributivity2 | optimized=0.01347 s | actual=0.57844 s
+[LAAB] Jax | am_distributivity2 | optimized=0.01358 s | actual=0.57354 s
+[LAAB] Jax | am_distributivity2 | optimized=0.01353 s | actual=0.55384 s
+[LAAB] Jax | am_distributivity2 | optimized=0.01364 s | actual=0.55267 s
+LAAB_REPS=5 LAAB_N=3000  python am_blocked.py 
+[LAAB] Jax | am_blocked | optimized=0.29503 s | actual=0.52020 s  | jnp_matmul=0.53844 s
+[LAAB] Jax | am_blocked | optimized=0.26597 s | actual=0.49374 s  | jnp_matmul=0.52773 s
+[LAAB] Jax | am_blocked | optimized=0.26512 s | actual=0.48869 s  | jnp_matmul=0.48877 s
+[LAAB] Jax | am_blocked | optimized=0.29541 s | actual=0.48840 s  | jnp_matmul=0.50033 s
+[LAAB] Jax | am_blocked | optimized=0.26614 s | actual=0.48879 s  | jnp_matmul=0.49130 s
+LAAB_REPS=5 LAAB_N=3000  python cm_loops.py 
+[LAAB] Jax | cm_loops | optimized=0.57754 s | actual=0.54632 s
+[LAAB] Jax | cm_loops | optimized=0.50827 s | actual=0.51274 s
+[LAAB] Jax | cm_loops | optimized=0.50719 s | actual=0.50732 s
+[LAAB] Jax | cm_loops | optimized=0.50745 s | actual=0.50639 s
+[LAAB] Jax | cm_loops | optimized=0.52934 s | actual=0.52436 s
+LAAB_REPS=5 LAAB_N=3000  python cm_partial_op_sum.py 
+[LAAB] Jax | cm_partial_op_sum | optimized=0.00796114 s | actual=0.00983879 s
+[LAAB] Jax | cm_partial_op_sum | optimized=0.00000414 s | actual=0.00000971 s
+[LAAB] Jax | cm_partial_op_sum | optimized=0.00000306 s | actual=0.00000345 s
+[LAAB] Jax | cm_partial_op_sum | optimized=0.00000284 s | actual=0.00000303 s
+[LAAB] Jax | cm_partial_op_sum | optimized=0.00000293 s | actual=0.00000303 s
+LAAB_REPS=5 LAAB_N=3000  python cm_partial_op_prod.py 
+[LAAB] Jax | cm_partial_op_prod | optimized=0.01098 s | actual=0.52401 s
+[LAAB] Jax | cm_partial_op_prod | optimized=0.00003 s | actual=0.51168 s
+[LAAB] Jax | cm_partial_op_prod | optimized=0.00007 s | actual=0.50217 s
+[LAAB] Jax | cm_partial_op_prod | optimized=0.00003 s | actual=0.49143 s
+[LAAB] Jax | cm_partial_op_prod | optimized=0.00004 s | actual=0.48946 s
