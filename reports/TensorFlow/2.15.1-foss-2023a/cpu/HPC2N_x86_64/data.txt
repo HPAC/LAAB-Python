@@ -1,0 +1,131 @@
+Model name:                           AMD EPYC 9454 48-Core Processor
+LAAB_REPS=5 LAAB_N=3000 LAAB_PREFIX='' /usr/bin/make -C ../../C/ run
+gcc -O3  sgemm.c -c
+gcc sgemm.o -o sgemm -lopenblas
+gcc -O3  ssyrk.c -c
+gcc ssyrk.o -o ssyrk -lopenblas
+gcc -O3  strmm.c -c
+gcc strmm.o -o strmm -lopenblas
+gcc -O3  stridiagmm.c -c -fopenmp
+gcc stridiagmm.o -o stridiagmm -fopenmp
+REP=5  ./sgemm 3000 3000 3000
+[LAAB] C | sgemm | optimized=0.464 s
+[LAAB] C | sgemm | optimized=0.462 s
+[LAAB] C | sgemm | optimized=0.461 s
+[LAAB] C | sgemm | optimized=0.461 s
+[LAAB] C | sgemm | optimized=0.462 s
+REP=5  ./ssyrk 3000 3000
+[LAAB] C | mp_syrk | optimized=0.241 s
+[LAAB] C | mp_syrk | optimized=0.240 s
+[LAAB] C | mp_syrk | optimized=0.240 s
+[LAAB] C | mp_syrk | optimized=0.240 s
+[LAAB] C | mp_syrk | optimized=0.240 s
+REP=5  ./strmm 3000 3000
+[LAAB] C | mp_trmm | optimized=0.232 s
+[LAAB] C | mp_trmm | optimized=0.231 s
+[LAAB] C | mp_trmm | optimized=0.231 s
+[LAAB] C | mp_trmm | optimized=0.232 s
+[LAAB] C | mp_trmm | optimized=0.231 s
+REP=5  ./stridiagmm 3000 3000
+[LAAB] C | mp_tridiag | optimized=0.004609 s
+[LAAB] C | mp_tridiag | optimized=0.004534 s
+[LAAB] C | mp_tridiag | optimized=0.004522 s
+[LAAB] C | mp_tridiag | optimized=0.004457 s
+[LAAB] C | mp_tridiag | optimized=0.004422 s
+rm *.o sgemm ssyrk strmm stridiagmm
+LAAB_REPS=5 LAAB_N=3000  python sgemm.py 
+[LAAB] TensorFlow | sgemm | actual=0.51220 s | linalg_matmul=0.47737 s
+[LAAB] TensorFlow | sgemm | actual=0.47914 s | linalg_matmul=0.46632 s
+[LAAB] TensorFlow | sgemm | actual=0.46294 s | linalg_matmul=0.46009 s
+[LAAB] TensorFlow | sgemm | actual=0.45960 s | linalg_matmul=0.46060 s
+[LAAB] TensorFlow | sgemm | actual=0.45832 s | linalg_matmul=0.47815 s
+LAAB_REPS=5 LAAB_N=3000  python cse_addition.py 
+[LAAB] TensorFlow | cse_addition | optimized=0.48320 s | actual=0.51990 s
+[LAAB] TensorFlow | cse_addition | optimized=0.46989 s | actual=0.48126 s
+[LAAB] TensorFlow | cse_addition | optimized=0.46044 s | actual=0.46383 s
+[LAAB] TensorFlow | cse_addition | optimized=0.46149 s | actual=0.46056 s
+[LAAB] TensorFlow | cse_addition | optimized=0.47885 s | actual=0.46019 s
+LAAB_REPS=5 LAAB_N=3000  python cse_matmul_paranthesis.py 
+[LAAB] TensorFlow | cse_matmul_paranthesis | optimized=0.96020 s | actual=0.97702 s
+[LAAB] TensorFlow | cse_matmul_paranthesis | optimized=0.92559 s | actual=0.93181 s
+[LAAB] TensorFlow | cse_matmul_paranthesis | optimized=0.93168 s | actual=0.93209 s
+[LAAB] TensorFlow | cse_matmul_paranthesis | optimized=0.92639 s | actual=0.91968 s
+[LAAB] TensorFlow | cse_matmul_paranthesis | optimized=0.92537 s | actual=0.94112 s
+LAAB_REPS=5 LAAB_N=3000  python cse_matmul_no_paranthesis.py 
+[LAAB] TensorFlow | cse_matmul_no_paranthesis | optimized=0.96514 s | actual=1.45842 s
+[LAAB] TensorFlow | cse_matmul_no_paranthesis | optimized=0.92164 s | actual=1.38088 s
+[LAAB] TensorFlow | cse_matmul_no_paranthesis | optimized=0.92219 s | actual=1.39903 s
+[LAAB] TensorFlow | cse_matmul_no_paranthesis | optimized=0.92602 s | actual=1.40206 s
+[LAAB] TensorFlow | cse_matmul_no_paranthesis | optimized=0.94563 s | actual=1.37395 s
+LAAB_REPS=5 LAAB_N=3000  python matchain_ltor.py 
+[LAAB] TensorFlow | matchain_ltor | optimized=0.02408 s | actual=0.04928 s
+[LAAB] TensorFlow | matchain_ltor | optimized=0.00236 s | actual=0.00248 s
+[LAAB] TensorFlow | matchain_ltor | optimized=0.00215 s | actual=0.00220 s
+[LAAB] TensorFlow | matchain_ltor | optimized=0.00218 s | actual=0.00218 s
+[LAAB] TensorFlow | matchain_ltor | optimized=0.00215 s | actual=0.00218 s
+LAAB_REPS=5 LAAB_N=3000  python matchain_rtol.py 
+[LAAB] TensorFlow | matchain_rtol | optimized=0.02374 s | actual=0.50318 s
+[LAAB] TensorFlow | matchain_rtol | optimized=0.00315 s | actual=0.45992 s
+[LAAB] TensorFlow | matchain_rtol | optimized=0.00430 s | actual=0.47420 s
+[LAAB] TensorFlow | matchain_rtol | optimized=0.00313 s | actual=0.46113 s
+[LAAB] TensorFlow | matchain_rtol | optimized=0.00340 s | actual=0.46570 s
+LAAB_REPS=5 LAAB_N=3000  python matchain_mixed.py 
+[LAAB] TensorFlow | matchain_mixed | optimized=0.02969 s | actual=0.57749 s
+[LAAB] TensorFlow | matchain_mixed | optimized=0.01457 s | actual=0.47623 s
+[LAAB] TensorFlow | matchain_mixed | optimized=0.00675 s | actual=0.48367 s
+[LAAB] TensorFlow | matchain_mixed | optimized=0.01223 s | actual=0.46320 s
+[LAAB] TensorFlow | matchain_mixed | optimized=0.01271 s | actual=0.46825 s
+LAAB_REPS=5 LAAB_N=3000  python mp_trmm.py 
+[LAAB] TensorFlow | mp_trmm | actual=0.50273 s | linalg_matmul=0.48940 s
+[LAAB] TensorFlow | mp_trmm | actual=0.47960 s | linalg_matmul=0.46847 s
+[LAAB] TensorFlow | mp_trmm | actual=0.46359 s | linalg_matmul=0.45978 s
+[LAAB] TensorFlow | mp_trmm | actual=0.45900 s | linalg_matmul=0.45976 s
+[LAAB] TensorFlow | mp_trmm | actual=0.45877 s | linalg_matmul=0.47581 s
+LAAB_REPS=5 LAAB_N=3000  python mp_syrk.py 
+[LAAB] TensorFlow | mp_syrk | actual=0.50132 s | linalg_matmul=0.47931 s
+[LAAB] TensorFlow | mp_syrk | actual=0.47375 s | linalg_matmul=0.45962 s
+[LAAB] TensorFlow | mp_syrk | actual=0.46457 s | linalg_matmul=0.46823 s
+[LAAB] TensorFlow | mp_syrk | actual=0.45950 s | linalg_matmul=0.46016 s
+[LAAB] TensorFlow | mp_syrk | actual=0.45703 s | linalg_matmul=0.46552 s
+LAAB_REPS=5 LAAB_N=3000  python mp_tridiag.py 
+[LAAB] TensorFlow | mp_tridiag | actual=0.50137 s | linalg_matmul=0.48961 s | linalg_tridiagonal_matmul=0.03560 s
+[LAAB] TensorFlow | mp_tridiag | actual=0.47662 s | linalg_matmul=0.46794 s | linalg_tridiagonal_matmul=0.00548 s
+[LAAB] TensorFlow | mp_tridiag | actual=0.46105 s | linalg_matmul=0.45689 s | linalg_tridiagonal_matmul=0.00550 s
+[LAAB] TensorFlow | mp_tridiag | actual=0.45691 s | linalg_matmul=0.45984 s | linalg_tridiagonal_matmul=0.00552 s
+[LAAB] TensorFlow | mp_tridiag | actual=0.45764 s | linalg_matmul=0.47626 s | linalg_tridiagonal_matmul=0.01507 s
+LAAB_REPS=5 LAAB_N=3000  python am_distributivity1.py 
+[LAAB] TensorFlow | am_distributivity1 | optimized=0.50348 s | actual=0.96182 s
+[LAAB] TensorFlow | am_distributivity1 | optimized=0.46522 s | actual=0.94232 s
+[LAAB] TensorFlow | am_distributivity1 | optimized=0.46879 s | actual=0.92948 s
+[LAAB] TensorFlow | am_distributivity1 | optimized=0.46750 s | actual=0.91823 s
+[LAAB] TensorFlow | am_distributivity1 | optimized=0.47104 s | actual=0.91562 s
+LAAB_REPS=5 LAAB_N=3000  python am_distributivity2.py 
+[LAAB] TensorFlow | am_distributivity2 | optimized=0.02745 s | actual=0.50300 s
+[LAAB] TensorFlow | am_distributivity2 | optimized=0.00444 s | actual=0.46207 s
+[LAAB] TensorFlow | am_distributivity2 | optimized=0.00540 s | actual=0.48368 s
+[LAAB] TensorFlow | am_distributivity2 | optimized=0.00440 s | actual=0.46025 s
+[LAAB] TensorFlow | am_distributivity2 | optimized=0.00473 s | actual=0.46751 s
+LAAB_REPS=5 LAAB_N=3000  python am_blocked.py 
+[LAAB] TensorFlow | am_blocked | optimized=0.28888 s | actual=0.51317 s  | linalg_matmul=0.49095 s
+[LAAB] TensorFlow | am_blocked | optimized=0.24618 s | actual=0.45889 s  | linalg_matmul=0.46657 s
+[LAAB] TensorFlow | am_blocked | optimized=0.24042 s | actual=0.47420 s  | linalg_matmul=0.46379 s
+[LAAB] TensorFlow | am_blocked | optimized=0.23224 s | actual=0.45737 s  | linalg_matmul=0.47528 s
+[LAAB] TensorFlow | am_blocked | optimized=0.24698 s | actual=0.45832 s  | linalg_matmul=0.45783 s
+LAAB_REPS=5 LAAB_N=3000  python cm_loops.py 
+[LAAB] TensorFlow | cm_loops | optimized=0.52094 s | actual=0.55487 s
+[LAAB] TensorFlow | cm_loops | optimized=0.46313 s | actual=0.46986 s
+[LAAB] TensorFlow | cm_loops | optimized=0.47045 s | actual=0.48461 s
+[LAAB] TensorFlow | cm_loops | optimized=0.46441 s | actual=0.46596 s
+[LAAB] TensorFlow | cm_loops | optimized=0.46274 s | actual=0.46386 s
+LAAB_REPS=5 LAAB_N=3000  python cm_partial_op_sum.py 
+[LAAB] TensorFlow | cm_partial_op_sum | optimized=0.02166 s | actual=0.03962 s
+[LAAB] TensorFlow | cm_partial_op_sum | optimized=0.00025 s | actual=0.00294 s
+[LAAB] TensorFlow | cm_partial_op_sum | optimized=0.00021 s | actual=0.00273 s
+[LAAB] TensorFlow | cm_partial_op_sum | optimized=0.00101 s | actual=0.00264 s
+[LAAB] TensorFlow | cm_partial_op_sum | optimized=0.00020 s | actual=0.00257 s
+LAAB_REPS=5 LAAB_N=3000  python cm_partial_op_prod.py 
+[LAAB] TensorFlow | cm_partial_op_prod | optimized=0.02776 s | actual=0.51630 s
+[LAAB] TensorFlow | cm_partial_op_prod | optimized=0.00050 s | actual=0.45868 s
+[LAAB] TensorFlow | cm_partial_op_prod | optimized=0.00132 s | actual=0.48016 s
+[LAAB] TensorFlow | cm_partial_op_prod | optimized=0.00049 s | actual=0.45936 s
+[LAAB] TensorFlow | cm_partial_op_prod | optimized=0.00076 s | actual=0.46296 s
