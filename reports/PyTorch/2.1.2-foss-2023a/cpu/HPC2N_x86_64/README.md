@@ -1,4 +1,4 @@
-## LAAB-Python | LA Awareness-CPU | ../reports | HPC2N_x86_64
+## LAAB-Python | LA Awareness-CPU | PyTorch/2.1.2-foss-2023a | HPC2N_x86_64
 
 This report evaluates whether the software build performs operations equivalent to those of optimized math libraries (e.g., OpenBLAS, MKL), and whether it leverages linear algebra techniques to accelerate CPU computations.  Unless stated otherwise, all benchmarks use matrices of size $3000 \times 3000$ and are executed on a single CPU core of AMD EPYC 9454 48-Core Processor. 
 

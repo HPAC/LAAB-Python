@@ -10,7 +10,7 @@ from jinja2 import Template
 def compare(value, ref_value):
     mean_value = statistics.mean(value[1:])
     mean_ref_value = statistics.mean(ref_value[1:])
-    if mean_value > mean_ref_value*1.40:
+    if mean_value > mean_ref_value*1.35:
         return ":x:",0
     return ":white_check_mark:",1
 
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     
     ## Identify the EB version and system from the data file path
     _parts = data_file.split(os.sep)
-    eb_name = f"{_parts[1]}/{_parts[2]}"
+    eb_name = f"{_parts[-5]}/{_parts[-4]}"
     system = _parts[-2]    
     print(f"Preparing report for {eb_name} on {system}")
     

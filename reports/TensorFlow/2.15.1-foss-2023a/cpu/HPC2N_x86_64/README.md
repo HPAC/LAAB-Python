@@ -1,4 +1,4 @@
-## LAAB-Python | LA Awareness-CPU | ../reports | HPC2N_x86_64
+## LAAB-Python | LA Awareness-CPU | TensorFlow/2.15.1-foss-2023a | HPC2N_x86_64
 
 This report evaluates whether the software build performs operations equivalent to those of optimized math libraries (e.g., OpenBLAS, MKL), and whether it leverages linear algebra techniques to accelerate CPU computations.  Unless stated otherwise, all benchmarks use matrices of size $3000 \times 3000$ and are executed on a single CPU core of AMD EPYC 9454 48-Core Processor. 
 
@@ -34,7 +34,7 @@ TensorFlow's matrix multiplication - using the `@` operator and the `tensorflow.
 |Expr|Call | time (s) |
 |-----|-----|----------|
 |$E_1$|`transpose(transpose(A)@B)@(transpose(A)@B)`| 0.9312 :white_check_mark: |
-|$E_2$|`transpose(transpose(A)@B)@transpose(A)@B`| 1.3890  :x: | 
+|$E_2$|`transpose(transpose(A)@B)@transpose(A)@B`| 1.3890  :white_check_mark: | 
 |**Reference**| `S=transpose(A)@B; transpose(S)@S`| **0.9273**|
 
 
@@ -106,7 +106,7 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 |----|----|-------------|
 |$AB$|`A@B`| 0.4631 :x: |
 |$"$|`linalg.matmul(A,B)`| 0.4652 :x:  |
-|$"$|`linalg.tridiagonal_matmul(A,B)`| 0.0079 :white_check_mark:  |
+|$"$|`linalg.tridiagonal_matmul(A,B)`| 0.0079 :x:  |
 |**Reference** |`csr(A)@B`| **0.0045**|
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
