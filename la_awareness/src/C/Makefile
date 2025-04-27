@@ -1,24 +1,32 @@
-# LAAB_PREFIX = taskset -c 0
-# LAAB_REPS = 3
+# LAAB_PREFIX = OMP_NUM_THREADS=58
+# LAAB_REPS = 5
 # LAAB_N = 3000
-# LD_BLAS = -lopenblas
+# LD_BLAS = -lmkl_rt
 
-run:
-	gcc -O2  sgemm.c -c
+
+sgemm:
+	gcc -O3  sgemm.c -c
 	gcc sgemm.o -o sgemm $(LD_BLAS)
+
+ssyrk:
+	gcc -O3  ssyrk.c -c
+	gcc ssyrk.o -o ssyrk $(LD_BLAS)
+
+strmm:
+	gcc -O3  strmm.c -c
+	gcc strmm.o -o strmm $(LD_BLAS)
+
+stridiagmm:
+	gcc -O3  stridiagmm.c -c -fopenmp
+	gcc stridiagmm.o -o stridiagmm -fopenmp
+
+run: sgemm ssyrk strmm stridiagmm
 	REP=$(LAAB_REPS) $(LAAB_PREFIX) ./sgemm $(LAAB_N) $(LAAB_N) $(LAAB_N)
-
-# oblas:
-# 	gcc -O2  sgemm.c -c
-# 	gcc sgemm.o -o sgemm -lopenblas
-
-# fblas:
-# 	gcc -O2  sgemm.c -c
-# 	gcc sgemm.o -o sgemm -lflexiblas
-
-# run:
-# 	taskset -c 0 ./sgemm 3000 3000 3000
+	REP=$(LAAB_REPS) $(LAAB_PREFIX) ./ssyrk $(LAAB_N) $(LAAB_N)
+	REP=$(LAAB_REPS) $(LAAB_PREFIX) ./strmm $(LAAB_N) $(LAAB_N)
+	REP=$(LAAB_REPS) $(LAAB_PREFIX) ./stridiagmm $(LAAB_N) $(LAAB_N)
+	rm *.o sgemm ssyrk strmm stridiagmm
 
 clean: 
-	rm sgemm.o sgemm
+	rm sgemm.o sgemm ssyrk.o ssyrk strmm.o strmm stridiagmm.o stridiagmm
 

@@ -1,14 +1,7 @@
 import torch
 import os
 import time
-import numpy as np
-from scipy import linalg
 
-
-def optimized(A):
-    ret = linalg.blas.ssyrk(1.0,A)
-    #ret = A@A.T
-    return ret
 
 @torch.jit.script
 def actual(A):
@@ -33,10 +26,6 @@ if __name__ == "__main__":
     DTYPE = torch.float32
 
     A = torch.randn([N, N], dtype=DTYPE)
-   
-    DTYPE = np.float32
-    A_opt = np.random.randn(N,N).astype(DTYPE)
-    A_opt = A_opt.ravel(order='F').reshape(A_opt.shape, order='F')
 
 
     for i in range(REPS):
@@ -50,11 +39,6 @@ if __name__ == "__main__":
         end = time.perf_counter()
         elapsed_matmul = end-start
         
-        start = time.perf_counter()
-        ret = optimized(A_opt)
-        end = time.perf_counter()
-        elapsed_optimized = end-start 
-        
-        print("[LAAB] PyTorch | mp_syrk | optimized={:.5f} s | actual={:.5f} s | linalg_matmul={:.5f} s".format(elapsed_optimized, elapsed_actual, elapsed_matmul))  
+        print("[LAAB] PyTorch | mp_syrk | actual={:.5f} s | linalg_matmul={:.5f} s".format(elapsed_actual, elapsed_matmul))  
     
 

@@ -4,6 +4,8 @@
 # LAAB_PREFIX = taskset -c 0
 # LAAB_REPS = 3
 # LAAB_N = 3000
+#LAAB_PREFIX = OMP_NUM_THREADS=58
+#LD_BLAS = -lmkl_rt
 
 
 SCRIPTS = \
@@ -27,7 +29,7 @@ SCRIPTS = \
 all: run_c run_py
 
 run_c:
-	LAAB_REPS=$(LAAB_REPS) LAAB_N=$(LAAB_N) LAAB_PREFIX='$(LAAB_PREFIX)' $(MAKE) -C ../../C/ run
+	LAAB_REPS=$(LAAB_REPS) LAAB_N=$(LAAB_N) LAAB_PREFIX='$(LAAB_PREFIX)' LD_BLAS=$(LD_BLAS) $(MAKE) -C ../../C/ run
 
 run_py: $(SCRIPTS:.py=.run)
 

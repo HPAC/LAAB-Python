@@ -17,7 +17,6 @@ SCRIPTS = \
 	mp_trmm.py \
 	mp_syrk.py \
 	mp_tridiag.py \
-	mp_diag.py \
 	am_distributivity1.py \
 	am_distributivity2.py \
 	am_blocked.py \
@@ -28,8 +27,7 @@ SCRIPTS = \
 all: run_c run_py
 
 run_c:
-	LAAB_REPS=$(LAAB_REPS) LAAB_N=$(LAAB_N) LAAB_PREFIX='$(LAAB_PREFIX)' $(MAKE) -C ../../C/
-	$(MAKE) -C ../../C/ clean
+	LAAB_REPS=$(LAAB_REPS) LAAB_N=$(LAAB_N) LAAB_PREFIX='$(LAAB_PREFIX)' $(MAKE) -C ../../C/ run
 
 run_py: $(SCRIPTS:.py=.run)
 

@@ -1,18 +1,6 @@
 import tensorflow as tf
 import os
 import time
-import numpy as np
-from scipy import linalg
-from scipy.sparse import diags
-
-
-def optimized(A,B):
-    main = np.diag(A)
-    lower = np.diag(A,-1)
-    upper = np.diag(A,1)
-    Ax = diags([lower, main, upper], offsets=[-1, 0, 1], format='csr')
-    ret = Ax @ B
-    return ret
 
 @tf.function
 def actual(A,B):
@@ -43,13 +31,6 @@ if __name__ == "__main__":
     A = tf.random.normal([N, N], dtype=DTYPE)
     A = tf.linalg.band_part(A, 1, 1)
     B = tf.random.normal([N, N], dtype=DTYPE)
-   
-    DTYPE = np.float32
-    A_opt = np.random.randn(N,N).astype(DTYPE)
-    A_opt = np.diag(np.diag(A_opt,1),1)+np.diag(np.diag(A_opt))+np.diag(np.diag(A_opt,-1),-1)
-    A_opt = A_opt.ravel(order='F').reshape(A_opt.shape, order='F')
-    B_opt = np.random.randn(N,N).astype(DTYPE)
-    B_opt = B_opt.ravel(order='F').reshape(B_opt.shape, order='F')
 
 
     for i in range(REPS):
@@ -68,11 +49,6 @@ if __name__ == "__main__":
         end = time.perf_counter()
         elaposed_tridiagonal = end-start
         
-        start = time.perf_counter()
-        ret = optimized(A_opt,B_opt)
-        end = time.perf_counter()
-        elapsed_optimized = end-start 
-        
-        print("[LAAB] TensorFlow | mp_tridiag | optimized={:.5f} s | actual={:.5f} s | linalg_matmul={:.5f} s | linalg_tridiagonal_matmul={:.5f} s".format(elapsed_optimized, elapsed_actual, elapsed_matmul, elaposed_tridiagonal))  
+        print("[LAAB] TensorFlow | mp_tridiag | actual={:.5f} s | linalg_matmul={:.5f} s | linalg_tridiagonal_matmul={:.5f} s".format(elapsed_actual, elapsed_matmul, elaposed_tridiagonal))  
     
 

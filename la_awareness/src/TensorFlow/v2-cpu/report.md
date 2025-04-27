@@ -100,7 +100,7 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
   c) **Tri-diagonal**
 
-  Matrix A is tri-diagonal. The reference implementation uses compressed sparse row format for $A$, which significantly reduces the number of FLOPs to evaluate the matrix product. 
+  Matrix A is tri-diagonal. The reference implementation performs the matrix multiplication using the compressed sparse row format for $A$, implemented in C, significantly reducing the number of FLOPs required for the computation. 
 
 |Expr|Call|  time (s)  | 
 |----|----|-------------|
@@ -108,17 +108,6 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 |$"$|`linalg.matmul(A,B)`| {{ mp_tridiag_linalg_matmul }} {{ mp_tridiag_linalg_matmul_result }}  |
 |$"$|`linalg.tridiagonal_matmul(A,B)`| {{ mp_tridiag_linalg_tridiagonal_matmul }} {{ mp_tridiag_linalg_tridiagonal_matmul_result }}  |
 |**Reference** |`csr(A)@B`| **{{ mp_tridiag_optimized }}**|
-
-  d) **Diagonal**
-
-  Matrix A is diagonal. The reference implementation uses compressed sparse row format for $A$, which significantly reduces the number of FLOPs to evaluate the matrix product. 
-
-|Expr|Call|  time (s)  | 
-|----|----|------------|
-|$AB$|`A@B`| {{ mp_diag_actual }} {{ mp_diag_actual_result }} |
-|$"$|`linalg.matmul(A,B)`| {{ mp_diag_linalg_matmul }} {{ mp_diag_linalg_matmul_result }}  |
-|$"$|`linalg.tridiagonal_matmul(A,B)`| {{ mp_diag_linalg_tridiagonal_matmul }} {{ mp_diag_linalg_tridiagonal_matmul_result }}  |
-|**Reference** |`csr(A)@B`| **{{ mp_diag_optimized }}**|
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
 
