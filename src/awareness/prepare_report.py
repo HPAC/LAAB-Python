@@ -38,7 +38,7 @@ if __name__ == "__main__":
     
     ## Identify the EB version and system from the data file path
     _parts = data_file.split(os.sep)
-    eb_name = f"{_parts[-5]}/{_parts[-4]}"
+    eb_name = f"{_parts[-4]}/{_parts[-3]}"
     system = _parts[-2]    
     print(f"Preparing report for {eb_name} on {system}")
     
@@ -135,7 +135,7 @@ if __name__ == "__main__":
     template = Template(template_content)
     rendered_template = template.render(inject)
   
-    report_file = os.path.join(os.path.dirname(data_file), "README.md")
+    report_file = os.path.join(os.path.dirname(data_file), "Awareness-CPU.md")
     with open(report_file, "w") as f:
         f.write(rendered_template)
     print(f"Report written to {report_file}")
