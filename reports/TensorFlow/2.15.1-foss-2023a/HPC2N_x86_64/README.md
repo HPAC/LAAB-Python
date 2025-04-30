@@ -106,7 +106,7 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 |----|----|-------------|
 |$AB$|`A@B`| 0.4631 :x: |
 |$"$|`linalg.matmul(A,B)`| 0.4652 :x:  |
-|$"$|`linalg.tridiagonal_matmul(A,B)`| 0.0079 :x:  |
+|$"$|`linalg.tridiagonal_matmul(A,B)`| 0.0079 :white_check_mark:  |
 |**Reference** |`csr(A)@B`| **0.0045**|
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />

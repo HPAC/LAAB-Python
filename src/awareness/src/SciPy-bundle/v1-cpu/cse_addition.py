@@ -1,43 +1,43 @@
-import torch
+import jax
+import jax.numpy as jnp
 import os
 import time
 
-
-#Sets the number of threads used for intraop parallelism on CPU.
-torch.set_num_threads(1)
-
-#Problem size
-n = 3000
-reps = 3
-DTYPE = torch.float32
-
-
-@torch.jit.script
-def actual_expr(A,B):
-    ret = torch.t(A)@B + torch.t(A)@B
+@jax.jit
+def actual(A,B):
+    ret = jnp.transpose(A)@B + jnp.transpose(A)@B
     return ret
 
-@torch.jit.script
-def simplified_expr(A,B):
-    tmp = torch.t(A)@B
+@jax.jit
+def optimized(A,B):
+    tmp = jnp.transpose(A)@B
     ret = tmp + tmp
     return ret
 
+if __name__ == "__main__":
 
-A = torch.randn([n, n], dtype=DTYPE)
-B = torch.randn([n, n], dtype=DTYPE)
-
-
-for i in range(reps):
-   start = time.perf_counter()
-   ret1 = actual_expr(A,B)
-   end = time.perf_counter()
-   elapsed = end-start
-
-   start = time.perf_counter()
-   ret1 = simplified_expr(A,B)
-   end = time.perf_counter()
-   optimized = end-start
+    jax.config.update('jax_platform_name', 'cpu')
+    
+    #Problem size
+    N = int(os.environ.get("LAAB_N", 3000))
+    reps = int(os.environ.get("LAAB_REPS", 3))
+    DTYPE = jnp.float32
+    
+    key = jax.random.PRNGKey(0)
+    A = jax.random.normal(key, (N, N), dtype=DTYPE)
+    B = jax.random.normal(key, (N, N), dtype=DTYPE)    
 
 
-   print("PyTorch | cse_addition | elapsed={:.5f} s | optimized={:.5f} s".format(elapsed,optimized))  
+    for i in range(reps):
+        start = time.perf_counter()
+        ret1 = actual(A,B)
+        end = time.perf_counter()
+        elapsed_actual = end-start
+
+        start = time.perf_counter()
+        ret1 = optimized(A,B)
+        end = time.perf_counter()
+        elapsed_optimized = end-start
+
+
+        print("[LAAB] Jax | cse_addition | optimized={:.5f} s | actual={:.5f} s".format(elapsed_optimized,elapsed_actual))  
