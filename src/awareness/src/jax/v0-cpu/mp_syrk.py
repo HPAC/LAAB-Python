@@ -34,12 +34,12 @@ if __name__ == "__main__":
 
     for i in range(REPS):
         start = time.perf_counter()
-        ret = actual(A)
+        ret = actual(A).block_until_ready()
         end = time.perf_counter()
         elapsed_actual = end-start
         
         start = time.perf_counter()
-        ret = jnp_matmul(A)
+        ret = jnp_matmul(A).block_until_ready()
         end = time.perf_counter()
         elapsed_matmul = end-start
         

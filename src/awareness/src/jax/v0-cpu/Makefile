@@ -1,11 +1,11 @@
 .PHONY: run
 
 # Uncomment the following  if you want to run this makefile independently
-# LAAB_PREFIX = taskset -c 0
+#LAAB_PREFIX = taskset -c 0
 # LAAB_REPS = 3
 # LAAB_N = 3000
-#LAAB_PREFIX = OMP_NUM_THREADS=58
-#LD_BLAS = -lmkl_rt
+# #LAAB_PREFIX = OMP_NUM_THREADS=58
+# LD_BLAS = -lopenblas
 
 
 SCRIPTS = \

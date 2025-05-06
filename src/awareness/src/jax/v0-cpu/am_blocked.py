@@ -39,17 +39,17 @@ if __name__ == "__main__":
 
     for i in range(reps):
         start = time.perf_counter()
-        ret1 = actual(A,B)
+        ret1 = actual(A,B).block_until_ready()
         end = time.perf_counter()
         elapsed_actual = end-start
         
         start = time.perf_counter()
-        ret = jnp_matmul(A,B)
+        ret = jnp_matmul(A,B).block_until_ready()
         end = time.perf_counter()
         elapsed_matmul = end-start
         
         start = time.perf_counter()
-        ret1 = optimized(A1,A2,B1,B2)
+        ret1 = optimized(A1,A2,B1,B2).block_until_ready()
         end = time.perf_counter()
         elapsed_optimized = end-start    
 

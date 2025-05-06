@@ -33,12 +33,12 @@ if __name__ == "__main__":
 
     for i in range(reps):
         start = time.perf_counter()
-        ret1 = actual(A,B,V,ret)
+        ret1 = actual(A,B,V,ret).block_until_ready()
         end = time.perf_counter()
         elapsed_actual = end-start
         
         start = time.perf_counter()
-        ret1 = optimized(A,B,V,ret)
+        ret1 = optimized(A,B,V,ret).block_until_ready()
         end = time.perf_counter()
         elapsed_optimized = end-start
 

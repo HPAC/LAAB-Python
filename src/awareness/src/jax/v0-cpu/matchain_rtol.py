@@ -36,19 +36,19 @@ if __name__ == "__main__":
 
     for i in range(reps):
         start = time.perf_counter()
-        ret = actual(H,x)
+        ret = actual(H,x).block_until_ready()
         end = time.perf_counter()
         
         elapsed_actual = end-start
         
         start = time.perf_counter()
-        ret = linalg_multidot(H,x)
+        ret = linalg_multidot(H,x).block_until_ready()
         end = time.perf_counter()
         
         elapsed_multidot = end-start
         
         start = time.perf_counter()
-        ret = optimized(H,x)
+        ret = optimized(H,x).block_until_ready()
         end = time.perf_counter()
         
         elapsed_optimized = end-start
