@@ -135,7 +135,8 @@ if __name__ == "__main__":
     template = Template(template_content)
     rendered_template = template.render(inject)
   
-    report_file = os.path.join(os.path.dirname(data_file), "Awareness-CPU.md")
+    #report_file = os.path.join(os.path.dirname(data_file), "Awareness-CPU.md")
+    report_file = os.path.join(os.path.dirname(data_file), "README.md")
     with open(report_file, "w") as f:
         f.write(rendered_template)
     print(f"Report written to {report_file}")
