@@ -1,4 +1,4 @@
-## LAAB-Python | LA Awareness-CPU | Awareness/benchmark | ..
+## LAAB-Python | LA Awareness-CPU | TensorFlow/2.15.1-foss-2023a | HPC2N_x86_64
 
 This report evaluates whether the software build performs operations equivalent to those of optimized math libraries (e.g., OpenBLAS, MKL), and whether it leverages linear algebra techniques to accelerate CPU computations.  Unless stated otherwise, all benchmarks use matrices of size $3000 \times 3000$ and are executed on a single CPU core of AMD EPYC 7413 24-Core Processor. 
 
@@ -8,9 +8,9 @@ TensorFlow's matrix multiplication - using the `@` operator and the `tensorflow.
 
 ||Call  |  time (s)  | 
 |----|------|------------|
-|$A^TB$|`transpose(A)@B`| 0.5323 :white_check_mark:|
-|$"$|`linalg.matmul(t(A),B)` | 0.5235 :white_check_mark: |
-|**Reference** |`sgemm`| **0.4932**|
+|$A^TB$|`transpose(A)@B`| 0.5302 :white_check_mark:|
+|$"$|`linalg.matmul(t(A),B)` | 0.5220 :white_check_mark: |
+|**Reference** |`sgemm`| **0.4952**|
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
 
@@ -24,8 +24,8 @@ TensorFlow's matrix multiplication - using the `@` operator and the `tensorflow.
 
 |Expr |Call |time (s) |
 |-----|-----|----------|
-|$E$ |`transpose(A)@B + transpose(A)@B` | 0.5396 :white_check_mark:| 
-|**Reference**| `2*(transpose(A)@B)`| **0.5309**|
+|$E$ |`transpose(A)@B + transpose(A)@B` | 0.5407 :white_check_mark:| 
+|**Reference**| `2*(transpose(A)@B)`| **0.5323**|
 
   b) **Repeated in multiplication**
 
@@ -33,9 +33,9 @@ TensorFlow's matrix multiplication - using the `@` operator and the `tensorflow.
 
 |Expr|Call | time (s) |
 |-----|-----|----------|
-|$E_1$|`transpose(transpose(A)@B)@(transpose(A)@B)`| 1.0589 :white_check_mark: |
-|$E_2$|`transpose(transpose(A)@B)@transpose(A)@B`| 1.6038  :x: | 
-|**Reference**| `S=transpose(A)@B; transpose(S)@S`| **1.0661**|
+|$E_1$|`transpose(transpose(A)@B)@(transpose(A)@B)`| 1.0652 :white_check_mark: |
+|$E_2$|`transpose(transpose(A)@B)@transpose(A)@B`| 1.6066  :x: | 
+|**Reference**| `S=transpose(A)@B; transpose(S)@S`| **1.0648**|
 
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
@@ -50,8 +50,8 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
 |Expr|Call| time (s)|
 |----|----|---------|
-|$H^THx$|`transpose(H)@H@x`| 0.5293 :x: | 
-|**Reference**| `transpose(H)@(H@x)`| **0.0050**|
+|$H^THx$|`transpose(H)@H@x`| 0.5296 :x: | 
+|**Reference**| `transpose(H)@(H@x)`| **0.0055**|
 
   b) **Left to right**:
 
@@ -59,8 +59,8 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
 |Expr|Call | time (s)|
 |----|-----|---------|
-|$y^TH^TH$|`transpose(y)@t(H)@H`| 0.0020 :white_check_mark: | 
-|**Reference**| `(transpose(y)@transpose(H))@H`| **0.0019**|
+|$y^TH^TH$|`transpose(y)@t(H)@H`| 0.0021 :white_check_mark: | 
+|**Reference**| `(transpose(y)@transpose(H))@H`| **0.0056**|
 
 
   c) **Mixed**:
@@ -69,8 +69,8 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
 |Expr|Call| time (s) |
 |----|----|-----------|
-|$H^Tyx^TH$|`transpose(H)@y@transpose(x)@H`| 0.5462 :x: | 
-|**Reference**| `(transpose(H)@y)@(transpose(x)@H)`| **0.0572**|
+|$H^Tyx^TH$|`transpose(H)@y@transpose(x)@H`| 0.5456 :x: | 
+|**Reference**| `(transpose(H)@y)@(transpose(x)@H)`| **0.0584**|
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
 
@@ -84,9 +84,9 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
 |Expr|Call |  time (s)  | 
 |----|-----|------------|
-|$AB$|`A@B`| 0.5325 :x: |
-|$"$|`linalg.matmul(A,B)`| 0.5227 :x:  |
-|**Reference** |`trmm`| **0.2470**|
+|$AB$|`A@B`| 0.5322 :x: |
+|$"$|`linalg.matmul(A,B)`| 0.5229 :x:  |
+|**Reference** |`trmm`| **0.2480**|
 
   b) **SYRK**
 
@@ -94,9 +94,9 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
 |Expr|Call| time (s)  | 
 |----|----|------------|
-|$AB$|`A@B`| 0.5421 :x: |
-|$"$|`linalg.matmul(A,B)`| 0.5358 :x:  |
-|**Reference** |`syrk`| **0.2530**|
+|$AB$|`A@B`| 0.5425 :x: |
+|$"$|`linalg.matmul(A,B)`| 0.5370 :x:  |
+|**Reference** |`syrk`| **0.2520**|
 
   c) **Tri-diagonal**
 
@@ -104,9 +104,9 @@ Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as
 
 |Expr|Call|  time (s)  | 
 |----|----|-------------|
-|$AB$|`A@B`| 0.5287 :x: |
-|$"$|`linalg.matmul(A,B)`| 0.5231 :x:  |
-|$"$|`linalg.tridiagonal_matmul(A,B)`| 0.0239 :x:  |
+|$AB$|`A@B`| 0.5301 :x: |
+|$"$|`linalg.matmul(A,B)`| 0.5226 :x:  |
+|$"$|`linalg.tridiagonal_matmul(A,B)`| 0.0242 :x:  |
 |**Reference** |`csr(A)@B`| **0.0045**|
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
@@ -121,15 +121,15 @@ The input expression is $E_1 = AB+AC$. This expression requires two $\mathcal{O}
 
 |Expr|Call| time (s)|
 |----|---|----------|
-|$E_1$|`A@B + A@C`| 1.0603 :x:| 
-|**Reference**|`A@(B+C)`|**0.5407**|
+|$E_1$|`A@B + A@C`| 1.0577 :x:| 
+|**Reference**|`A@(B+C)`|**0.5451**|
 
 Now, the input expression is $E_2 = (A - H^TH)x$, which involves one $\mathcal{O}(n^3)$ matrix multiplication. This expression can be rewritten as $Ax - H^T(Hx)$, thereby avoiding the $\mathcal{O}(n^3)$ matrix multiplcation. 
 
 |Expr|Call| time (s)|
 |----|---|----------|
-|$E_2$|`(A - transpose(H)@H)@x`| 0.5349 :x:| 
-|**Reference**|`A@x - transpose(H)@(H@x)`|**0.0067**|
+|$E_2$|`(A - transpose(H)@H)@x`| 0.5450 :x:| 
+|**Reference**|`A@x - transpose(H)@(H@x)`|**0.0066**|
 
 
   b) **Identifying the blocked matrix structure**:
@@ -146,9 +146,9 @@ AB := \begin{bmatrix} (A_1B_1) \\ (A_2B_2) \end{bmatrix}
 
 |Expr|Call| time (s)|
 |----|---|----------|
-|$AB$|`A@B`| 0.5259 :x: | 
-|$"$|`linalg.matmul(A,B)` | 0.5404 :x: | 
-|**Reference**|`blocked matrix multiply`|**0.2786**|
+|$AB$|`A@B`| 0.5241 :x: | 
+|$"$|`linalg.matmul(A,B)` | 0.5285 :x: | 
+|**Reference**|`blocked matrix multiply`|**0.2817**|
 
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
@@ -163,8 +163,8 @@ Some operations, when moved around, can result in improved performance.
 
 ||Call| time (s)|
 |----|------|----------|
-||`for i in range(3):` <br> `   A@B + tensordot(V[i],t(V[i])`| 0.5789  :white_check_mark: |
-|**Reference**|`S=A@B;` <br> `for i in range(3):` <br>`   S+tensordot(V[i],t(V[i]) `|**0.5797**| 
+||`for i in range(3):` <br> `   A@B + tensordot(V[i],t(V[i])`| 0.5820  :white_check_mark: |
+|**Reference**|`S=A@B;` <br> `for i in range(3):` <br>`   S+tensordot(V[i],t(V[i]) `|**0.5861**| 
 
   b) **Identifying partial operand access**:
 
@@ -172,14 +172,14 @@ The output of the expression `(A+B)[2,2]` requires only single element of both t
 
 ||Call | time (s)|
 |----|-----|---------|
-||`(A+B)[2,2]`| 0.0186 :x: | 
+||`(A+B)[2,2]`| 0.0182 :x: | 
 |**Reference**|`A[2]+B[2]`|**0.0003**|
 
 Similarly, the output of the expression `(A@B)[2,2]` also requires only single element of both the matrices. Here, the explicit multiplication of the full matrices can be avoided. 
 
 ||Call | time (s)|
 |----|-----|---------|
-||`(A@B)[2,2]`| 0.5290 :x: | 
+||`(A@B)[2,2]`| 0.5291 :x: | 
 |**Reference**|`tensordot(A[2,:],B[:,2])`|**0.0014**|
 
 

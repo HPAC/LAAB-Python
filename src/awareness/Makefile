@@ -21,7 +21,7 @@ tf_v2_cpu:
 
 jax_v0_cpu:
 	rm -f $(LAAB_REPORTS_DIR)/data.txt
-	lscpu | grep "Model name" > ../../$(LAAB_JAX_CPU_RESULTS_DIR)/data.txt
+	lscpu | grep "Model name" > $(LAAB_REPORTS_DIR)/data.txt
 	@$(MAKE) --no-print-directory -C src/jax/v0-cpu | tee -a $(LAAB_REPORTS_DIR)/data.txt
 	@echo "Results saved to $(LAAB_REPORTS_DIR)/data.txt"
 	python prepare_report.py src/jax/v0-cpu/report.md $(LAAB_REPORTS_DIR)/data.txt

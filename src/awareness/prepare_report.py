@@ -38,8 +38,8 @@ if __name__ == "__main__":
     
     ## Identify the EB version and system from the data file path
     _parts = data_file.split(os.sep)
-    eb_name = f"{_parts[-4]}/{_parts[-3]}"
-    system = _parts[-2]    
+    eb_name = f"{_parts[-7]}/{_parts[-6]}"
+    system = _parts[-5]    
     print(f"Preparing report for {eb_name} on {system}")
     
     inject = {
