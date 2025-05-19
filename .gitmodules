@@ -1,0 +1,3 @@
+[submodule "external/laab-utils"]
+	path = external/laab-utils
+	url = https://gitlab.jsc.fz-juelich.de/laab/laab-utils.git
