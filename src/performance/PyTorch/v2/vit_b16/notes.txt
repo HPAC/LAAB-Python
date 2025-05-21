@@ -1,0 +1,12 @@
+cpu batch size: 1 takes 0.49 sec
+A100 batch size: 220
+
+48 CPU cores + 4 A100 GPUs ==> 44 + 4*220 = 924 images
+
+size of 924 images = 924*3*224*224*4/1024/1024 = 530 MB for every hald a second..
+
+so input req approx 1 GB per sec
+
+JUWELS booster capacity: 200Gbitsx4 = 800 Gbits = 100 GB/s ==> needs only 1/100th of the link capacity.. 
+
+
