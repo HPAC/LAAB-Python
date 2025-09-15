@@ -37,19 +37,29 @@ Description: The input expression is $E_1 = A^TB + A^TB$. The subexpression $A^T
 |**Reference**| `2*(t(A)@B)`| **0.526**| | |
 
 
-b) **Repeated in multiplication**
+b) **Repeated in multiplication (parenthesis)**
 
 Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
 
-Description: The input expression is $E_2 = (A^TB)^T(A^TB)$ and $E_3 = (A^TB)^TA^TB$. Evaluating these expressions from right to left involves three matrix multiplications. The reference implementation avoids the redundant computation of the common subexpression resulting in just two matrix multiplications.
+Description: The input expression is $E_2 = (A^TB)^T(A^TB)$. The reference implementation avoids the redundant computation of the common subexpression.
 
 |Expr|Call | time (s) | loss | result@0.05 |
 |-----|-----|----------|--|--|
 |$E_2$|`t(t(A)@B)@(t(A)@B)`| 1.019 | 0.0 | :white_check_mark: |
+|**Reference**| `S=t(A)@B; t(S)@S`| **1.018**| | |
+
+c) **Repeated in multiplication (no parenthesis)**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $E_3 = (A^TB)^TA^TB$. The reference implementation avoids the redundant computation of the common subexpression.
+
+|Expr|Call | time (s) | loss | result@0.05 |
+|-----|-----|----------|--|--|
 |$E_3$|`t(t(A)@B)@t(A)@B`| 1.52 |  0.504 | :x: |
 |**Reference**| `S=t(A)@B; t(S)@S`| **1.018**| | |
 
-c) **Sub-optimal CSE**
+d) **Sub-optimal CSE**
 
 TODO
 
@@ -92,5 +102,45 @@ Description: The input matrix chain is $H^Tyx^TH$. Here, neither left-to-right n
 |$H^Tyx^TH$|`t(H)@y@t(x)@H`| 0.531 | 21.921 | :x: |
 |$"$|`linalg.multi_dot([t(H), y, t(x), H])`| 0.024 | 0.0 | :white_check_mark: |
 |**Reference**| `(t(H)@y)@(t(x)@H)`| **0.023**| | |
+
+<hr style="border: none; height: 1px; background-color: #ccc;" />
+
+### Test 4: Matrix properties
+
+a) **TRMM**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $AB$, where $A$ is lower triangular. The reference implementation utilises the BLAS kernel `trmm`, which computes the matrix product with half the number of FLOPs than that required by `gemm`.
+
+|Expr|Call |  time (s)  | loss | result@0.05|
+|----|-----|------------|--|--|
+|$AB$|`A@B`| 0.509 | 1.052 | :x: |
+|$"$|`linalg.matmul(A,B)`| 0.511 | 1.062  | :x: |
+|**Reference** |`trmm`| **0.248**| | |
+
+b) **SYRK**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $AB$, where $A$ is transpose of  $B$. The reference implementation utilises the BLAS routine, `syrk` ("SYmmetric Rank-K update"), which computes the matrix product with only half the number of FLOPs than `gemm`.
+
+|Expr|Call |  time (s)  | loss | result@0.05|
+|----|-----|------------|--|--|
+|$AB$|`A@B`| 0.508 | 1.014 | :x: |
+|$"$|`linalg.matmul(A,B)`| 0.51 | 1.023  | :x: |
+|**Reference** |`syrk`| **0.252**| | |
+
+c) **Tri-diagonal**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Dwscription: The input expression is $AB$, where $A$ is tri-diagonal. The reference implementation performs the matrix multiplication using the compressed sparse row format for $A$, implemented in C.
+
+|Expr|Call |  time (s)  | loss | result@0.05|
+|----|-----|------------|--|--|
+|$AB$|`A@B`| 0.506 | 115.294 | :x: |
+|$"$|`linalg.matmul(A,B)`| 0.508 | 115.784  | :x: |
+|**Reference** |`csr(A)@B`| **0.004**| | |
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />

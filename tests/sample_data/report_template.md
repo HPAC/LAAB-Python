@@ -37,19 +37,29 @@ Description: The input expression is $E_1 = A^TB + A^TB$. The subexpression $A^T
 |**Reference**| `2*(t(A)@B)`| **{{ times.cse_addition.optimized }}**| | |
 
 
-b) **Repeated in multiplication**
+b) **Repeated in multiplication (parenthesis)**
 
 Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
 
-Description: The input expression is $E_2 = (A^TB)^T(A^TB)$ and $E_3 = (A^TB)^TA^TB$. Evaluating these expressions from right to left involves three matrix multiplications. The reference implementation avoids the redundant computation of the common subexpression resulting in just two matrix multiplications.
+Description: The input expression is $E_2 = (A^TB)^T(A^TB)$. The reference implementation avoids the redundant computation of the common subexpression.
 
 |Expr|Call | time (s) | loss | result@{{ cutoff }} |
 |-----|-----|----------|--|--|
 |$E_2$|`t(t(A)@B)@(t(A)@B)`| {{ times.cse_matmul_paranthesis.tests.actual }} | {{ losses.cse_matmul_paranthesis.actual }} | {{ cutoff_results.cse_matmul_paranthesis.actual }} |
+|**Reference**| `S=t(A)@B; t(S)@S`| **{{ times.cse_matmul_paranthesis.optimized }}**| | |
+
+c) **Repeated in multiplication (no parenthesis)**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $E_3 = (A^TB)^TA^TB$. The reference implementation avoids the redundant computation of the common subexpression.
+
+|Expr|Call | time (s) | loss | result@{{ cutoff }} |
+|-----|-----|----------|--|--|
 |$E_3$|`t(t(A)@B)@t(A)@B`| {{ times.cse_matmul_no_paranthesis.tests.actual }} |  {{ losses.cse_matmul_no_paranthesis.actual }} | {{ cutoff_results.cse_matmul_no_paranthesis.actual }} |
 |**Reference**| `S=t(A)@B; t(S)@S`| **{{ times.cse_matmul_paranthesis.optimized }}**| | |
 
-c) **Sub-optimal CSE**
+d) **Sub-optimal CSE**
 
 TODO
 
@@ -92,5 +102,45 @@ Description: The input matrix chain is $H^Tyx^TH$. Here, neither left-to-right n
 |$H^Tyx^TH$|`t(H)@y@t(x)@H`| {{ times.matchain_mixed.tests.actual }} | {{ losses.matchain_mixed.actual }} | {{ cutoff_results.matchain_mixed.actual }} |
 |$"$|`linalg.multi_dot([t(H), y, t(x), H])`| {{ times.matchain_mixed.tests.linalg_multidot }} | {{ losses.matchain_mixed.linalg_multidot }} | {{ cutoff_results.matchain_mixed.linalg_multidot }} |
 |**Reference**| `(t(H)@y)@(t(x)@H)`| **{{ times.matchain_mixed.optimized }}**| | |
+
+<hr style="border: none; height: 1px; background-color: #ccc;" />
+
+### Test 4: Matrix properties
+
+a) **TRMM**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $AB$, where $A$ is lower triangular. The reference implementation utilises the BLAS kernel `trmm`, which computes the matrix product with half the number of FLOPs than that required by `gemm`.
+
+|Expr|Call |  time (s)  | loss | result@{{ cutoff }}|
+|----|-----|------------|--|--|
+|$AB$|`A@B`| {{ times.mp_trmm.tests.actual }} | {{ losses.mp_trmm.actual }} | {{ cutoff_results.mp_trmm.actual }} |
+|$"$|`linalg.matmul(A,B)`| {{ times.mp_trmm.tests.linalg_matmul }} | {{ losses.mp_trmm.linalg_matmul }}  | {{ cutoff_results.mp_trmm.linalg_matmul }} |
+|**Reference** |`trmm`| **{{ times.mp_trmm.optimized }}**| | |
+
+b) **SYRK**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $AB$, where $A$ is transpose of  $B$. The reference implementation utilises the BLAS routine, `syrk` ("SYmmetric Rank-K update"), which computes the matrix product with only half the number of FLOPs than `gemm`.
+
+|Expr|Call |  time (s)  | loss | result@{{ cutoff }}|
+|----|-----|------------|--|--|
+|$AB$|`A@B`| {{ times.mp_syrk.tests.actual }} | {{ losses.mp_syrk.actual }} | {{ cutoff_results.mp_syrk.actual }} |
+|$"$|`linalg.matmul(A,B)`| {{ times.mp_syrk.tests.linalg_matmul }} | {{ losses.mp_syrk.linalg_matmul }}  | {{ cutoff_results.mp_syrk.linalg_matmul }} |
+|**Reference** |`syrk`| **{{ times.mp_syrk.optimized }}**| | |
+
+c) **Tri-diagonal**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Dwscription: The input expression is $AB$, where $A$ is tri-diagonal. The reference implementation performs the matrix multiplication using the compressed sparse row format for $A$, implemented in C.
+
+|Expr|Call |  time (s)  | loss | result@{{ cutoff }}|
+|----|-----|------------|--|--|
+|$AB$|`A@B`| {{ times.mp_tridiag.tests.actual }} | {{ losses.mp_tridiag.actual }} | {{ cutoff_results.mp_tridiag.actual }} |
+|$"$|`linalg.matmul(A,B)`| {{ times.mp_tridiag.tests.linalg_matmul }} | {{ losses.mp_tridiag.linalg_matmul }}  | {{ cutoff_results.mp_tridiag.linalg_matmul }} |
+|**Reference** |`csr(A)@B`| **{{ times.mp_tridiag.optimized }}**| | |
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
