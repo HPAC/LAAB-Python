@@ -2,7 +2,7 @@
 
 ### Benchmark Information
 
-|  PyTorch/2.1.2-foss-2023a | |
+| Framework | PyTorch/2.1.2-foss-2023a | 
 |---|---|
 | **System** | HPC2N_x86_64 |
 | **CPU** | AMD EPYC 7413 24-Core Processor | 

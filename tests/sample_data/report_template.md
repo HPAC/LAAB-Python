@@ -2,7 +2,7 @@
 
 ### Benchmark Information
 
-|  {{ eb_name }} | |
+| Framework | {{ eb_name }} | 
 |---|---|
 | **System** | {{ system }} |
 | **CPU** | {{ cpu_model }} | 
