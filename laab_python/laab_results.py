@@ -8,6 +8,7 @@ class LAABResults:
         self.system = system
         self.cpu_model =  ""
         self.data = {}
+        
         self._prepare(data_file)
         
         self.loss = {}

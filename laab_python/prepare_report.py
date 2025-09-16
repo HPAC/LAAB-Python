@@ -2,6 +2,7 @@ import os
 import sys
 import statistics
 from jinja2 import Template
+import json
 from .laab_results import LAABResults
 
 def format_floats_recursive(data: dict, precision: int = 2) -> dict:
@@ -27,7 +28,19 @@ def format_cutoff_results_md(cutoff_results):
                 cutoff_results[exp][test] = ":x:"
     return cutoff_results
 
-def prepare_markdown_report(laab_results, template_file, outfile, cutoff=0.05):
+def prepare_markdown_report(laab_results, src_config_file, exp_config, template_file, outfile, cutoff=0.05):
+    
+    if not os.path.exists(src_config_file):
+        raise FileNotFoundError(f"Config file {src_config_file} not found")
+    config = json.load(open(src_config_file, "r"))
+
+    
+    if set(laab_results.data.keys()) != set(config.keys()):
+        raise ValueError("Experiments in data file and config file do not match")
+    
+    
+    if not os.path.exists(template_file):
+        raise FileNotFoundError(f"Template file {template_file} not found")
     
     min_exec_times = laab_results.get_min_test_times()
     laab_results.compute_loss()
@@ -52,7 +65,9 @@ def prepare_markdown_report(laab_results, template_file, outfile, cutoff=0.05):
         "score": score,
         "num_tests": len(losses),
         "times": format_floats_recursive(min_exec_times,prec),
-        "cutoff": f"{cutoff:.2f}"
+        "cutoff": f"{cutoff:.2f}",
+        "config": config,
+        "exp_config": exp_config
     }
     
     with open(template_file, "r") as f:
