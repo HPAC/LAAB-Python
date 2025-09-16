@@ -1,4 +1,4 @@
-# Report | LAAB-Python | CPU 
+# Report | LAAB-Python | {{ exp_config.name }} 
 
 | Framework | {{ eb_name }} | 
 |---|---|
@@ -6,6 +6,7 @@
 | **CPU** | {{ cpu_model }} | 
 | **LAAB_N** | {{ exp_config.laab_n }} |
 | **LAAB_REP** | {{ exp_config.laab_rep }} |
+| **OMP_NUM_THREADS** | {{ exp_config.omp_num_threads }} |
 
 <!-- <hr style="border: none; height: 1px; background-color: #ccc;" /> -->
 
@@ -62,8 +63,14 @@ Description: The input expression is $E_3 = (A^TB)^TA^TB$. The reference impleme
 
 d) **Sub-optimal CSE**
 
-TODO
+Operands: $A, B \in \mathbb{R}^{ {{exp_config.laab_n}} \times {{ exp_config.laab_n }} }$ and $y \in \mathbb{R}^{ {{ exp_config.laab_n }} }$
 
+Description: The input expression is $E_4 = A^TBA^TBy$. The reference implementation evaluates $E_4$ from right-to-left without CSE.
+
+|Expr|Call | time (s) | loss | result@{{ cutoff }} |
+|-----|-----|----------|--|--|
+|$E_4$|`{{ config.cse_suboptimal.tests.actual }}`| {{ times.cse_suboptimal.tests.actual }} |  {{ losses.cse_suboptimal.actual }} | {{ cutoff_results.cse_suboptimal.actual }} |
+|**Reference**| `{{ config.cse_suboptimal.optimized }}`| **{{ times.cse_suboptimal.optimized }}**| | |
 
 ## Test 3: Matrix chains
 

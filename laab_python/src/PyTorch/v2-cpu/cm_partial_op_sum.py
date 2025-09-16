@@ -15,7 +15,8 @@ def optimized(A,B):
 if __name__ == "__main__":
     
     #Sets the number of threads used for intraop parallelism on CPU.
-    torch.set_num_threads(1)
+    THREADS = int(os.environ.get("OMP_NUM_THREADS", 1))
+    torch.set_num_threads(THREADS)
 
     #Problem size
     n = int(os.environ.get("LAAB_N", 3000))

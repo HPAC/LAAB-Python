@@ -57,6 +57,12 @@ LAAB_REPS=5 LAAB_N=3000  python cse_matmul_no_paranthesis.py
 [LAAB] PyTorch | cse_matmul_no_paranthesis | optimized=1.01224 s | actual=1.52117 s
 [LAAB] PyTorch | cse_matmul_no_paranthesis | optimized=1.01180 s | actual=1.52463 s
 [LAAB] PyTorch | cse_matmul_no_paranthesis | optimized=1.01075 s | actual=1.52043 s
+LAAB_REPS=5 LAAB_N=3000  python cse_suboptimal.py 
+[LAAB] PyTorch | cse_suboptimal | optimized=0.03126 s | actual=1.91287 s
+[LAAB] PyTorch | cse_suboptimal | optimized=0.03207 s | actual=1.83155 s
+[LAAB] PyTorch | cse_suboptimal | optimized=0.02873 s | actual=1.78674 s
+[LAAB] PyTorch | cse_suboptimal | optimized=0.02931 s | actual=1.77736 s
+[LAAB] PyTorch | cse_suboptimal | optimized=0.02804 s | actual=1.80355 s
 LAAB_REPS=5 LAAB_N=3000  python matchain_ltor.py 
 [LAAB] PyTorch | matchain_ltor | optimized=0.00598 s | actual=0.00820 s | linalg_multidot=0.03564 s
 [LAAB] PyTorch | matchain_ltor | optimized=0.00619 s | actual=0.00605 s | linalg_multidot=0.00623 s

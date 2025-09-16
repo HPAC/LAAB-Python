@@ -2,7 +2,7 @@ from laab_python.prepare_report import prepare_markdown_report
 from laab_python.laab_results import LAABResults
 
 def test1():
-    template_file = "tests/sample_data/report_template.md"
+    template_file = "templates/report_template.md"
     data_file = "tests/sample_data/data.txt"
     src_config_file = "laab_python/src/PyTorch/v2-cpu/config.json"
     eb_version = "PyTorch/2.1.2-foss-2023a"
@@ -11,7 +11,9 @@ def test1():
     
     exp_config = {
         "laab_n":3000,
-        "laab_rep":5
+        "laab_rep":5,
+        "name": "1xCore",
+        "omp_num_threads": 1
     }
     
     laab_results = LAABResults(data_file, eb_version, system)

@@ -24,6 +24,12 @@
         },
         "optimized": "S=t(A)@B; t(S)@S"
     },
+    "cse_suboptimal":{
+        "tests":{
+            "actual": "t(A)@B@t(A)@B@y"
+        },
+        "optimized": "t(A)@(B@(t(A)@(B@y))"
+    },
     "matchain_rtol":{
         "tests":{
             "actual": "t(H)@H@x",
