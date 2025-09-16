@@ -143,7 +143,8 @@ Description: The input expression is $AB$, where $A$ is tri-diagonal. The refere
 |Expr|Call |  time (s)  | loss | result@0.10|
 |----|-----|------------|--|--|
 |$AB$|`A@B`| 0.518 | 116.535 | :x: |
-|$"$|`linalg.matmul(A,B)`| 0.519 | 116.694  | :x: |
+|$"$|`linalg.matmul(A,B)`| 0.519 | 116.694  | :x: | 
+|$"$|`linalg.tridiagonal_matmul(A,B)`| 0.023 | 4.104  | :x: | 
 |**Reference** |`csr(A)@B`| **0.004**| | |
 
 

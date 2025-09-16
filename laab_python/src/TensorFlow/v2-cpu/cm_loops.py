@@ -18,8 +18,9 @@ def optimized(A,B,V,ret):
 if __name__ == "__main__":
     
     #Set threads
-    tf.config.threading.set_inter_op_parallelism_threads(1)
-    tf.config.threading.set_intra_op_parallelism_threads(1)
+    THREADS = int(os.environ.get("OMP_NUM_THREADS", 1))
+    tf.config.threading.set_inter_op_parallelism_threads(THREADS)
+    tf.config.threading.set_intra_op_parallelism_threads(THREADS)
 
     #Problem size
     n = int(os.environ.get("LAAB_N", 3000))

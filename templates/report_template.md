@@ -146,7 +146,8 @@ Description: The input expression is $AB$, where $A$ is tri-diagonal. The refere
 |Expr|Call |  time (s)  | loss | result@{{ cutoff }}|
 |----|-----|------------|--|--|
 |$AB$|`{{ config.mp_tridiag.tests.actual }}`| {{ times.mp_tridiag.tests.actual }} | {{ losses.mp_tridiag.actual }} | {{ cutoff_results.mp_tridiag.actual }} |
-|$"$|`{{ config.mp_tridiag.tests.linalg_matmul }}`| {{ times.mp_tridiag.tests.linalg_matmul }} | {{ losses.mp_tridiag.linalg_matmul }}  | {{ cutoff_results.mp_tridiag.linalg_matmul }} |
+|$"$|`{{ config.mp_tridiag.tests.linalg_matmul }}`| {{ times.mp_tridiag.tests.linalg_matmul }} | {{ losses.mp_tridiag.linalg_matmul }}  | {{ cutoff_results.mp_tridiag.linalg_matmul }} | {% if config.mp_tridiag.tests.linalg_tridiagonal_matmul %}
+|$"$|`{{ config.mp_tridiag.tests.linalg_tridiagonal_matmul }}`| {{ times.mp_tridiag.tests.linalg_tridiagonal_matmul }} | {{ losses.mp_tridiag.linalg_tridiagonal_matmul }}  | {{ cutoff_results.mp_tridiag.linalg_tridiagonal_matmul }} | {% endif %}
 |**Reference** |`{{ config.mp_tridiag.optimized }}`| **{{ times.mp_tridiag.optimized }}**| | |
 
 

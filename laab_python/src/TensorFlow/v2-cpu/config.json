@@ -65,7 +65,8 @@
     "mp_tridiag":{
         "tests": {
             "actual": "A@B",
-            "linalg_matmul": "linalg.matmul(A,B)"
+            "linalg_matmul": "linalg.matmul(A,B)",
+            "linalg_tridiagonal_matmul": "linalg.tridiagonal_matmul(A,B)"
         },
         "optimized": "csr(A)@B"
     },
