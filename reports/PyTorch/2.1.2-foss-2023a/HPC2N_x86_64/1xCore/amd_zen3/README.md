@@ -3,7 +3,7 @@
 | Framework | PyTorch/2.1.2-foss-2023a | 
 |---|---|
 | **System** | HPC2N_x86_64 |
-| **CPU** | AMD EPYC 9454 48-Core Processor | 
+| **CPU** | AMD EPYC 7413 24-Core Processor | 
 | **LAAB_N** | 3000 |
 | **LAAB_REP** | 10 |
 | **OMP_NUM_THREADS** | 1 |
@@ -20,9 +20,9 @@ Description: The time taken for general matrix multiplication $A^TB$ is compared
 
 ||Call  |  time (s)  | loss | result@0.05 | 
 |----|------|------------|--|---|
-|$A^TB$|`t(A)@B`| 0.473 | 0.019| :white_check_mark: |
-|$"$|`linalg.matmul(t(A),B)` | 0.472 | 0.017 | :white_check_mark: |
-|**Reference** |`sgemm`| **0.464**| | |
+|$A^TB$|`t(A)@B`| 0.508 | 0.027| :white_check_mark: |
+|$"$|`linalg.matmul(t(A),B)` | 0.512 | 0.034 | :white_check_mark: |
+|**Reference** |`sgemm`| **0.495**| | |
 
 
 ## Test 2: CSE
@@ -35,8 +35,8 @@ Description: The input expression is $E_1 = A^TB + A^TB$. The subexpression $A^T
 
 |Expr |Call |time (s) | loss | result@0.05 |
 |-----|-----|----------|--|--|
-|$E_1$ |`t(A)@B + t(A)@B` | 0.491 | 0.005| :white_check_mark: | 
-|**Reference**| `2*(t(A)@B)`| **0.489**| | |
+|$E_1$ |`t(A)@B + t(A)@B` | 0.523 | 0.0| :white_check_mark: | 
+|**Reference**| `2*(t(A)@B)`| **0.523**| | |
 
 
 b) **Repeated in multiplication (parenthesis)**
@@ -47,8 +47,8 @@ Description: The input expression is $E_2 = (A^TB)^T(A^TB)$. The reference imple
 
 |Expr|Call | time (s) | loss | result@0.05 |
 |-----|-----|----------|--|--|
-|$E_2$|`t(t(A)@B)@(t(A)@B)`| 0.949 | 0.0 | :white_check_mark: |
-|**Reference**| `S=t(A)@B; t(S)@S`| **0.951**| | |
+|$E_2$|`t(t(A)@B)@(t(A)@B)`| 1.02 | 0.0 | :white_check_mark: |
+|**Reference**| `S=t(A)@B; t(S)@S`| **1.021**| | |
 
 c) **Repeated in multiplication (no parenthesis)**
 
@@ -58,13 +58,19 @@ Description: The input expression is $E_3 = (A^TB)^TA^TB$. The reference impleme
 
 |Expr|Call | time (s) | loss | result@0.05 |
 |-----|-----|----------|--|--|
-|$E_3$|`t(t(A)@B)@t(A)@B`| 1.429 |  0.499 | :x: |
-|**Reference**| `S=t(A)@B; t(S)@S`| **0.951**| | |
+|$E_3$|`t(t(A)@B)@t(A)@B`| 1.526 |  0.502 | :x: |
+|**Reference**| `S=t(A)@B; t(S)@S`| **1.021**| | |
 
 d) **Sub-optimal CSE**
 
-TODO
+Operands: $A, B \in \mathbb{R}^{ 3000 \times 3000 }$ and $y \in \mathbb{R}^{ 3000 }$
 
+Description: The input expression is $E_4 = A^TBA^TBy$. The reference implementation evaluates $E_4$ from right-to-left without CSE.
+
+|Expr|Call | time (s) | loss | result@0.05 |
+|-----|-----|----------|--|--|
+|$E_4$|`t(A)@B@t(A)@B@y`| 1.528 |  114.388 | :x: |
+|**Reference**| `t(A)@(B@(t(A)@(B@y))`| **0.013**| | |
 
 ## Test 3: Matrix chains
 
@@ -76,8 +82,8 @@ Description: The input matrix chain is $H^THx$. The reference implementation, ev
 
 |Expr|Call| time (s)| loss | result@0.05 |
 |----|----|---------|--|--|
-|$H^THx$|`t(H)@H@x`| 0.478 | 88.985 | :x: | 
-|$"$|`linalg.multi_dot([t(H), H, x])`| 0.006 | 0.077 | :x: |  
+|$H^THx$|`t(H)@H@x`| 0.51 | 94.977 | :x: | 
+|$"$|`linalg.multi_dot([t(H), H, x])`| 0.006 | 0.107 | :x: |  
 |**Reference**| `t(H)@(H@x)`| **0.005**| | |
 
 b) **Left to right**:
@@ -100,9 +106,9 @@ Description: The input matrix chain is $H^Tyx^TH$. Here, neither left-to-right n
 
 |Expr|Call| time (s) | loss | result@0.05 |
 |----|----|-----------|--|--|
-|$H^Tyx^TH$|`t(H)@y@t(x)@H`| 0.491 | 21.45 | :x: | 
-|$"$|`linalg.multi_dot([t(H), y, t(x), H])`| 0.022 | 0.009 | :white_check_mark: | 
-|**Reference**| `(t(H)@y)@(t(x)@H)`| **0.022**| | |
+|$H^Tyx^TH$|`t(H)@y@t(x)@H`| 0.527 | 21.181 | :x: | 
+|$"$|`linalg.multi_dot([t(H), y, t(x), H])`| 0.025 | 0.05 | :white_check_mark: | 
+|**Reference**| `(t(H)@y)@(t(x)@H)`| **0.024**| | |
 
 
 ## Test 4: Matrix properties
@@ -115,9 +121,9 @@ Description: The input expression is $AB$, where $A$ is lower triangular. The re
 
 |Expr|Call |  time (s)  | loss | result@0.05|
 |----|-----|------------|--|--|
-|$AB$|`A@B`| 0.472 | 1.045 | :x: |
-|$"$|`linalg.matmul(A,B)`| 0.472 | 1.043  | :x: |
-|**Reference** |`trmm`| **0.231**| | |
+|$AB$|`A@B`| 0.505 | 1.045 | :x: |
+|$"$|`linalg.matmul(A,B)`| 0.508 | 1.058  | :x: |
+|**Reference** |`trmm`| **0.247**| | |
 
 b) **SYRK**
 
@@ -127,9 +133,9 @@ Description: The input expression is $AB$, where $A$ is transpose of  $B$. The r
 
 |Expr|Call |  time (s)  | loss | result@0.05|
 |----|-----|------------|--|--|
-|$AB$|`A@B`| 0.473 | 0.971 | :x: |
-|$"$|`linalg.matmul(A,B)`| 0.473 | 0.972  | :x: |
-|**Reference** |`syrk`| **0.24**| | |
+|$AB$|`A@B`| 0.506 | 1.001 | :x: |
+|$"$|`linalg.matmul(A,B)`| 0.509 | 1.013  | :x: |
+|**Reference** |`syrk`| **0.253**| | |
 
 c) **Tri-diagonal**
 
@@ -139,8 +145,8 @@ Description: The input expression is $AB$, where $A$ is tri-diagonal. The refere
 
 |Expr|Call |  time (s)  | loss | result@0.05|
 |----|-----|------------|--|--|
-|$AB$|`A@B`| 0.473 | 108.53 | :x: |
-|$"$|`linalg.matmul(A,B)`| 0.472 | 108.374  | :x: |
+|$AB$|`A@B`| 0.508 | 115.794 | :x: |
+|$"$|`linalg.matmul(A,B)`| 0.511 | 116.497  | :x: |
 |**Reference** |`csr(A)@B`| **0.004**| | |
 
 
@@ -154,8 +160,8 @@ Description: The input expression is $E_1 = AB+AC$. This expression requires two
 
 |Expr|Call| time (s)| loss | result@0.05 |
 |----|---|----------|--|--|
-|$E_1$|`A@B+ A@C`| 0.961 | 0.968| :x: |
-|**Reference**|`A@(B+C)`|**0.488**| | |
+|$E_1$|`A@B+ A@C`| 1.042 | 0.972| :x: |
+|**Reference**|`A@(B+C)`|**0.528**| | |
 
 b) **Distributivity 2**
 
@@ -165,8 +171,8 @@ Description: The input expression is $E_2 = (A - H^TH)x$, which involves one $\m
 
 |Expr|Call| time (s)| loss | result@0.05 |
 |----|---|----------|--|--|
-|$E_2$|`(A - t(H)@H)@x`| 0.494 | 53.929| :x: |
-|**Reference**|`A@x - t(H)@(H@x)`|**0.009**| | |
+|$E_2$|`(A - t(H)@H)@x`| 0.527 | 53.241| :x: |
+|**Reference**|`A@x - t(H)@(H@x)`|**0.01**| | |
 
 c) **Blocked matrix**
 
@@ -176,9 +182,9 @@ Description: The input expression is $AB$, where $A$ consists of two blocks alon
 
 |Expr|Call| time (s)| loss | result@0.05 |
 |----|---|----------|--|--|
-|$AB$|`A@B`| 0.462 | 0.859 | :x: |
-|$"$|`linalg.matmul(A,B)` | 0.471 | 0.895 | :x: |
-|**Reference**|`blocked matrix multiply`|**0.248**| | |
+|$AB$|`A@B`| 0.497 | 0.885 | :x: |
+|$"$|`linalg.matmul(A,B)` | 0.509 | 0.93 | :x: |
+|**Reference**|`blocked matrix multiply`|**0.264**| | |
 
 
 ## Test 6: Code motion
@@ -191,8 +197,8 @@ Description: The input expression is $AB$ computed inside a loop. The reference 
 
 ||Call| time (s)| loss | result@0.05 |
 |----|---|----------|--|--|
-||`for i in range(3): A@B ...`| 0.506 |  0.0 | :white_check_mark: |
-|**Reference**|`A@B; for i in range(3): ...`|**0.508**| | | 
+||`for i in range(3): A@B ...`| 0.544 |  0.0 | :white_check_mark: |
+|**Reference**|`A@B; for i in range(3): ...`|**0.545**| | | 
 
 b) **Partial operand access in sum**
 
@@ -202,7 +208,7 @@ Description: The input expression is $(A+B)[2,2]$, which requires only single el
 
 ||Call| time (s)| loss | result@0.05 |
 |----|---|----------|--|--|
-||`(A+B)[2,2]`| 0.013 | 6.122 | :x: |
+||`(A+B)[2,2]`| 0.016 | 6.663 | :x: |
 |**Reference**|`A[2,2] + B[2,2]`|**0.002**| | |
 
 c) **Partial operand access in product**
@@ -213,14 +219,14 @@ Description: The input expression is $(AB)[2,2]$, which requires only single ele
 
 ||Call| time (s)| loss | result@0.05 |
 |----|---|----------|--|--|
-||`(A@B)[2,2]`| 0.47 | 218.509 | :x: |
+||`(A@B)[2,2]`| 0.503 | 201.084 | :x: |
 |**Reference**|`dot(A[2,:],B[:,2])`|**0.002**| | |
 
 
 ## OVERALL RESULT
 
-### Mean loss: 24.461 
+### Mean loss: 29.162 
 
-### Score: 6 / 16
+### Score: 6 / 17
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />

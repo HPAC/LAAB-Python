@@ -1,0 +1,284 @@
+Architecture:                            x86_64
+CPU op-mode(s):                          32-bit, 64-bit
+Address sizes:                           48 bits physical, 48 bits virtual
+Byte Order:                              Little Endian
+CPU(s):                                  48
+On-line CPU(s) list:                     0-47
+Vendor ID:                               AuthenticAMD
+Model name:                              AMD EPYC 7413 24-Core Processor
+CPU family:                              25
+Model:                                   1
+Thread(s) per core:                      1
+Core(s) per socket:                      24
+Socket(s):                               2
+Stepping:                                1
+Frequency boost:                         enabled
+CPU(s) scaling MHz:                      66%
+CPU max MHz:                             2650.0000
+CPU min MHz:                             1500.0000
+BogoMIPS:                                5289.95
+Flags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 invpcid_single hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd amd_ppin arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca
+Virtualization:                          AMD-V
+L1d cache:                               1.5 MiB (48 instances)
+L1i cache:                               1.5 MiB (48 instances)
+L2 cache:                                24 MiB (48 instances)
+L3 cache:                                256 MiB (8 instances)
+NUMA node(s):                            2
+NUMA node0 CPU(s):                       0-23
+NUMA node1 CPU(s):                       24-47
+Vulnerability Gather data sampling:      Not affected
+Vulnerability Indirect target selection: Not affected
+Vulnerability Itlb multihit:             Not affected
+Vulnerability L1tf:                      Not affected
+Vulnerability Mds:                       Not affected
+Vulnerability Meltdown:                  Not affected
+Vulnerability Mmio stale data:           Not affected
+Vulnerability Reg file data sampling:    Not affected
+Vulnerability Retbleed:                  Not affected
+Vulnerability Spec rstack overflow:      Mitigation; safe RET
+Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl and seccomp
+Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:                Mitigation; Retpolines; IBPB disabled; IBRS_FW; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected
+Vulnerability Srbds:                     Not affected
+Vulnerability Tsx async abort:           Not affected
+LAAB_REPS=10 LAAB_N=8000 LAAB_PREFIX='' /usr/bin/make -C ../../C/ run
+gcc -O3  sgemm.c -c
+gcc sgemm.o -o sgemm -lopenblas
+gcc -O3  ssyrk.c -c
+gcc ssyrk.o -o ssyrk -lopenblas
+gcc -O3  strmm.c -c
+gcc strmm.o -o strmm -lopenblas
+gcc -O3  stridiagmm.c -c -fopenmp
+gcc stridiagmm.o -o stridiagmm -fopenmp
+REP=10  ./sgemm 8000 8000 8000
+[LAAB] C | sgemm | optimized=0.531 s
+[LAAB] C | sgemm | optimized=0.534 s
+[LAAB] C | sgemm | optimized=0.523 s
+[LAAB] C | sgemm | optimized=0.522 s
+[LAAB] C | sgemm | optimized=0.529 s
+[LAAB] C | sgemm | optimized=0.526 s
+[LAAB] C | sgemm | optimized=0.524 s
+[LAAB] C | sgemm | optimized=0.523 s
+[LAAB] C | sgemm | optimized=0.522 s
+[LAAB] C | sgemm | optimized=0.528 s
+REP=10  ./ssyrk 8000 8000
+[LAAB] C | mp_syrk | optimized=4.755 s
+[LAAB] C | mp_syrk | optimized=4.746 s
+[LAAB] C | mp_syrk | optimized=4.750 s
+[LAAB] C | mp_syrk | optimized=4.751 s
+[LAAB] C | mp_syrk | optimized=4.745 s
+[LAAB] C | mp_syrk | optimized=4.753 s
+[LAAB] C | mp_syrk | optimized=4.754 s
+[LAAB] C | mp_syrk | optimized=4.752 s
+[LAAB] C | mp_syrk | optimized=4.749 s
+[LAAB] C | mp_syrk | optimized=4.754 s
+REP=10  ./strmm 8000 8000
+[LAAB] C | mp_trmm | optimized=0.300 s
+[LAAB] C | mp_trmm | optimized=0.285 s
+[LAAB] C | mp_trmm | optimized=0.284 s
+[LAAB] C | mp_trmm | optimized=0.307 s
+[LAAB] C | mp_trmm | optimized=0.284 s
+[LAAB] C | mp_trmm | optimized=0.284 s
+[LAAB] C | mp_trmm | optimized=0.320 s
+[LAAB] C | mp_trmm | optimized=0.337 s
+[LAAB] C | mp_trmm | optimized=0.284 s
+[LAAB] C | mp_trmm | optimized=0.284 s
+REP=10  ./stridiagmm 8000 8000
+[LAAB] C | mp_tridiag | optimized=0.006908 s
+[LAAB] C | mp_tridiag | optimized=0.005399 s
+[LAAB] C | mp_tridiag | optimized=0.005360 s
+[LAAB] C | mp_tridiag | optimized=0.005096 s
+[LAAB] C | mp_tridiag | optimized=0.004955 s
+[LAAB] C | mp_tridiag | optimized=0.011791 s
+[LAAB] C | mp_tridiag | optimized=0.005200 s
+[LAAB] C | mp_tridiag | optimized=0.004990 s
+[LAAB] C | mp_tridiag | optimized=0.004946 s
+[LAAB] C | mp_tridiag | optimized=0.004911 s
+rm *.o sgemm ssyrk strmm stridiagmm
+LAAB_REPS=10 LAAB_N=8000  python sgemm.py 
+[LAAB] PyTorch | sgemm | actual=0.71076 s | linalg_matmul=0.73033 s
+[LAAB] PyTorch | sgemm | actual=0.72189 s | linalg_matmul=0.71614 s
+[LAAB] PyTorch | sgemm | actual=0.72646 s | linalg_matmul=0.71934 s
+[LAAB] PyTorch | sgemm | actual=0.71787 s | linalg_matmul=0.71657 s
+[LAAB] PyTorch | sgemm | actual=0.71551 s | linalg_matmul=0.72337 s
+[LAAB] PyTorch | sgemm | actual=0.71477 s | linalg_matmul=0.71649 s
+[LAAB] PyTorch | sgemm | actual=0.71432 s | linalg_matmul=0.72106 s
+[LAAB] PyTorch | sgemm | actual=0.72448 s | linalg_matmul=0.71772 s
+[LAAB] PyTorch | sgemm | actual=0.71500 s | linalg_matmul=0.71717 s
+[LAAB] PyTorch | sgemm | actual=0.71623 s | linalg_matmul=0.71888 s
+LAAB_REPS=10 LAAB_N=8000  python cse_addition.py 
+[LAAB] PyTorch | cse_addition | optimized=0.74712 s | actual=0.73643 s
+[LAAB] PyTorch | cse_addition | optimized=0.74546 s | actual=0.75408 s
+[LAAB] PyTorch | cse_addition | optimized=0.74504 s | actual=0.75611 s
+[LAAB] PyTorch | cse_addition | optimized=0.74275 s | actual=0.75285 s
+[LAAB] PyTorch | cse_addition | optimized=0.74531 s | actual=0.74302 s
+[LAAB] PyTorch | cse_addition | optimized=0.76167 s | actual=0.74336 s
+[LAAB] PyTorch | cse_addition | optimized=0.74823 s | actual=0.74198 s
+[LAAB] PyTorch | cse_addition | optimized=0.75467 s | actual=0.74443 s
+[LAAB] PyTorch | cse_addition | optimized=0.74237 s | actual=0.74402 s
+[LAAB] PyTorch | cse_addition | optimized=0.74432 s | actual=0.74391 s
+LAAB_REPS=10 LAAB_N=8000  python cse_matmul_paranthesis.py 
+[LAAB] PyTorch | cse_matmul_paranthesis | optimized=1.43728 s | actual=1.42327 s
+[LAAB] PyTorch | cse_matmul_paranthesis | optimized=1.45438 s | actual=1.44805 s
+[LAAB] PyTorch | cse_matmul_paranthesis | optimized=1.43676 s | actual=1.43480 s
+[LAAB] PyTorch | cse_matmul_paranthesis | optimized=1.44534 s | actual=1.43808 s
+[LAAB] PyTorch | cse_matmul_paranthesis | optimized=1.43295 s | actual=1.45992 s
+[LAAB] PyTorch | cse_matmul_paranthesis | optimized=1.43293 s | actual=1.43165 s
+[LAAB] PyTorch | cse_matmul_paranthesis | optimized=1.43528 s | actual=1.43701 s
+[LAAB] PyTorch | cse_matmul_paranthesis | optimized=1.44531 s | actual=1.48535 s
+[LAAB] PyTorch | cse_matmul_paranthesis | optimized=1.43058 s | actual=1.43315 s
+[LAAB] PyTorch | cse_matmul_paranthesis | optimized=1.43975 s | actual=1.43990 s
+LAAB_REPS=10 LAAB_N=8000  python cse_matmul_no_paranthesis.py 
+[LAAB] PyTorch | cse_matmul_no_paranthesis | optimized=1.42974 s | actual=2.15122 s
+[LAAB] PyTorch | cse_matmul_no_paranthesis | optimized=1.43356 s | actual=2.17062 s
+[LAAB] PyTorch | cse_matmul_no_paranthesis | optimized=1.43375 s | actual=2.15449 s
+[LAAB] PyTorch | cse_matmul_no_paranthesis | optimized=1.44198 s | actual=2.15246 s
+[LAAB] PyTorch | cse_matmul_no_paranthesis | optimized=1.44174 s | actual=2.14683 s
+[LAAB] PyTorch | cse_matmul_no_paranthesis | optimized=1.43357 s | actual=2.15217 s
+[LAAB] PyTorch | cse_matmul_no_paranthesis | optimized=1.43188 s | actual=2.15225 s
+[LAAB] PyTorch | cse_matmul_no_paranthesis | optimized=1.42688 s | actual=2.14326 s
+[LAAB] PyTorch | cse_matmul_no_paranthesis | optimized=1.43024 s | actual=2.14742 s
+[LAAB] PyTorch | cse_matmul_no_paranthesis | optimized=1.42760 s | actual=2.14608 s
+LAAB_REPS=10 LAAB_N=8000  python cse_suboptimal.py 
+[LAAB] PyTorch | cse_suboptimal | optimized=0.01539 s | actual=2.18420 s
+[LAAB] PyTorch | cse_suboptimal | optimized=0.05185 s | actual=2.18147 s
+[LAAB] PyTorch | cse_suboptimal | optimized=0.01476 s | actual=2.16280 s
+[LAAB] PyTorch | cse_suboptimal | optimized=0.01818 s | actual=2.18425 s
+[LAAB] PyTorch | cse_suboptimal | optimized=0.01465 s | actual=2.16003 s
+[LAAB] PyTorch | cse_suboptimal | optimized=0.01488 s | actual=2.18834 s
+[LAAB] PyTorch | cse_suboptimal | optimized=0.01482 s | actual=2.16307 s
+[LAAB] PyTorch | cse_suboptimal | optimized=0.01493 s | actual=2.17160 s
+[LAAB] PyTorch | cse_suboptimal | optimized=0.02412 s | actual=2.16559 s
+[LAAB] PyTorch | cse_suboptimal | optimized=0.01995 s | actual=2.15941 s
+LAAB_REPS=10 LAAB_N=8000  python matchain_ltor.py 
+[LAAB] PyTorch | matchain_ltor | optimized=0.00852 s | actual=0.01198 s | linalg_multidot=0.03697 s
+[LAAB] PyTorch | matchain_ltor | optimized=0.00888 s | actual=0.00858 s | linalg_multidot=0.00873 s
+[LAAB] PyTorch | matchain_ltor | optimized=0.00921 s | actual=0.00869 s | linalg_multidot=0.00851 s
+[LAAB] PyTorch | matchain_ltor | optimized=0.00856 s | actual=0.00853 s | linalg_multidot=0.00844 s
+[LAAB] PyTorch | matchain_ltor | optimized=0.00850 s | actual=0.00858 s | linalg_multidot=0.00857 s
+[LAAB] PyTorch | matchain_ltor | optimized=0.00856 s | actual=0.00845 s | linalg_multidot=0.00849 s
+[LAAB] PyTorch | matchain_ltor | optimized=0.00840 s | actual=0.00848 s | linalg_multidot=0.00854 s
+[LAAB] PyTorch | matchain_ltor | optimized=0.00836 s | actual=0.00848 s | linalg_multidot=0.00845 s
+[LAAB] PyTorch | matchain_ltor | optimized=0.00837 s | actual=0.00831 s | linalg_multidot=0.00835 s
+[LAAB] PyTorch | matchain_ltor | optimized=0.00840 s | actual=0.00840 s | linalg_multidot=0.00844 s
+LAAB_REPS=10 LAAB_N=8000  python matchain_rtol.py 
+[LAAB] PyTorch | matchain_rtol | optimized=0.00878 s | actual=0.73741 s | linalg_multidot=0.03715 s
+[LAAB] PyTorch | matchain_rtol | optimized=0.00902 s | actual=0.73078 s | linalg_multidot=0.00863 s
+[LAAB] PyTorch | matchain_rtol | optimized=0.00855 s | actual=0.73405 s | linalg_multidot=0.01278 s
+[LAAB] PyTorch | matchain_rtol | optimized=0.00862 s | actual=0.72738 s | linalg_multidot=0.00837 s
+[LAAB] PyTorch | matchain_rtol | optimized=0.00845 s | actual=0.72684 s | linalg_multidot=0.00841 s
+[LAAB] PyTorch | matchain_rtol | optimized=0.00819 s | actual=0.72708 s | linalg_multidot=0.00824 s
+[LAAB] PyTorch | matchain_rtol | optimized=0.00841 s | actual=0.72973 s | linalg_multidot=0.00816 s
+[LAAB] PyTorch | matchain_rtol | optimized=0.00846 s | actual=0.73302 s | linalg_multidot=0.00830 s
+[LAAB] PyTorch | matchain_rtol | optimized=0.00860 s | actual=0.73477 s | linalg_multidot=0.00855 s
+[LAAB] PyTorch | matchain_rtol | optimized=0.00855 s | actual=0.73177 s | linalg_multidot=0.01145 s
+LAAB_REPS=10 LAAB_N=8000  python matchain_mixed.py 
+[LAAB] PyTorch | matchain_mixed | optimized=0.22269 s | actual=0.92592 s | linalg_multidot=0.25172 s
+[LAAB] PyTorch | matchain_mixed | optimized=0.22326 s | actual=0.94147 s | linalg_multidot=0.22633 s
+[LAAB] PyTorch | matchain_mixed | optimized=0.22303 s | actual=0.94332 s | linalg_multidot=0.22162 s
+[LAAB] PyTorch | matchain_mixed | optimized=0.22341 s | actual=0.94942 s | linalg_multidot=0.22323 s
+[LAAB] PyTorch | matchain_mixed | optimized=0.22391 s | actual=0.94028 s | linalg_multidot=0.22186 s
+[LAAB] PyTorch | matchain_mixed | optimized=0.22186 s | actual=0.93448 s | linalg_multidot=0.22210 s
+[LAAB] PyTorch | matchain_mixed | optimized=0.22346 s | actual=0.93649 s | linalg_multidot=0.22448 s
+[LAAB] PyTorch | matchain_mixed | optimized=0.22486 s | actual=0.93984 s | linalg_multidot=0.23697 s
+[LAAB] PyTorch | matchain_mixed | optimized=0.22324 s | actual=0.93432 s | linalg_multidot=0.22291 s
+[LAAB] PyTorch | matchain_mixed | optimized=0.22387 s | actual=0.93703 s | linalg_multidot=0.22201 s
+LAAB_REPS=10 LAAB_N=8000  python mp_trmm.py 
+[LAAB] PyTorch | mp_trmm | actual=0.70035 s | linalg_matmul=0.71939 s
+[LAAB] PyTorch | mp_trmm | actual=0.72151 s | linalg_matmul=0.71637 s
+[LAAB] PyTorch | mp_trmm | actual=0.71988 s | linalg_matmul=0.71848 s
+[LAAB] PyTorch | mp_trmm | actual=0.72556 s | linalg_matmul=0.71768 s
+[LAAB] PyTorch | mp_trmm | actual=0.71821 s | linalg_matmul=0.71956 s
+[LAAB] PyTorch | mp_trmm | actual=0.71473 s | linalg_matmul=0.71579 s
+[LAAB] PyTorch | mp_trmm | actual=0.71449 s | linalg_matmul=0.72287 s
+[LAAB] PyTorch | mp_trmm | actual=0.71491 s | linalg_matmul=0.72019 s
+[LAAB] PyTorch | mp_trmm | actual=0.72012 s | linalg_matmul=0.71363 s
+[LAAB] PyTorch | mp_trmm | actual=0.71486 s | linalg_matmul=0.71763 s
+LAAB_REPS=10 LAAB_N=8000  python mp_syrk.py 
+[LAAB] PyTorch | mp_syrk | actual=0.70437 s | linalg_matmul=0.71922 s
+[LAAB] PyTorch | mp_syrk | actual=0.73101 s | linalg_matmul=0.71821 s
+[LAAB] PyTorch | mp_syrk | actual=0.75291 s | linalg_matmul=0.71953 s
+[LAAB] PyTorch | mp_syrk | actual=0.71923 s | linalg_matmul=0.71834 s
+[LAAB] PyTorch | mp_syrk | actual=0.71554 s | linalg_matmul=0.72459 s
+[LAAB] PyTorch | mp_syrk | actual=0.71844 s | linalg_matmul=0.71879 s
+[LAAB] PyTorch | mp_syrk | actual=0.71686 s | linalg_matmul=0.71805 s
+[LAAB] PyTorch | mp_syrk | actual=0.71669 s | linalg_matmul=0.72123 s
+[LAAB] PyTorch | mp_syrk | actual=0.71554 s | linalg_matmul=0.71889 s
+[LAAB] PyTorch | mp_syrk | actual=0.71978 s | linalg_matmul=0.72036 s
+LAAB_REPS=10 LAAB_N=8000  python mp_tridiag.py 
+[LAAB] PyTorch | mp_tridiag | actual=0.70171 s | linalg_matmul=0.71942 s
+[LAAB] PyTorch | mp_tridiag | actual=0.71826 s | linalg_matmul=0.71778 s
+[LAAB] PyTorch | mp_tridiag | actual=0.71742 s | linalg_matmul=0.72043 s
+[LAAB] PyTorch | mp_tridiag | actual=0.72588 s | linalg_matmul=0.71562 s
+[LAAB] PyTorch | mp_tridiag | actual=0.71303 s | linalg_matmul=0.71950 s
+[LAAB] PyTorch | mp_tridiag | actual=0.71105 s | linalg_matmul=0.71758 s
+[LAAB] PyTorch | mp_tridiag | actual=0.71298 s | linalg_matmul=0.71463 s
+[LAAB] PyTorch | mp_tridiag | actual=0.71148 s | linalg_matmul=0.71948 s
+[LAAB] PyTorch | mp_tridiag | actual=0.71662 s | linalg_matmul=0.71217 s
+[LAAB] PyTorch | mp_tridiag | actual=0.71053 s | linalg_matmul=0.71727 s
+LAAB_REPS=10 LAAB_N=8000  python am_distributivity1.py 
+[LAAB] PyTorch | am_distributivity1 | optimized=0.74277 s | actual=1.45190 s
+[LAAB] PyTorch | am_distributivity1 | optimized=0.74575 s | actual=1.48650 s
+[LAAB] PyTorch | am_distributivity1 | optimized=0.74521 s | actual=1.48551 s
+[LAAB] PyTorch | am_distributivity1 | optimized=0.74039 s | actual=1.46349 s
+[LAAB] PyTorch | am_distributivity1 | optimized=0.74920 s | actual=1.46068 s
+[LAAB] PyTorch | am_distributivity1 | optimized=0.74289 s | actual=1.46516 s
+[LAAB] PyTorch | am_distributivity1 | optimized=0.74700 s | actual=1.47977 s
+[LAAB] PyTorch | am_distributivity1 | optimized=0.73870 s | actual=1.46866 s
+[LAAB] PyTorch | am_distributivity1 | optimized=0.74176 s | actual=1.46043 s
+[LAAB] PyTorch | am_distributivity1 | optimized=0.73893 s | actual=1.45326 s
+LAAB_REPS=10 LAAB_N=8000  python am_distributivity2.py 
+[LAAB] PyTorch | am_distributivity2 | optimized=0.01073 s | actual=0.75100 s
+[LAAB] PyTorch | am_distributivity2 | optimized=0.01114 s | actual=0.75207 s
+[LAAB] PyTorch | am_distributivity2 | optimized=0.01481 s | actual=0.76334 s
+[LAAB] PyTorch | am_distributivity2 | optimized=0.01018 s | actual=0.74445 s
+[LAAB] PyTorch | am_distributivity2 | optimized=0.01115 s | actual=0.75392 s
+[LAAB] PyTorch | am_distributivity2 | optimized=0.01024 s | actual=0.75250 s
+[LAAB] PyTorch | am_distributivity2 | optimized=0.01015 s | actual=0.74707 s
+[LAAB] PyTorch | am_distributivity2 | optimized=0.01009 s | actual=0.74405 s
+[LAAB] PyTorch | am_distributivity2 | optimized=0.01041 s | actual=0.74642 s
+[LAAB] PyTorch | am_distributivity2 | optimized=0.01480 s | actual=0.74785 s
+LAAB_REPS=10 LAAB_N=8000  python am_blocked.py 
+[LAAB] PyTorch | am_blocked | optimized=0.49197 s | actual=0.69706 s  | linalg_matmul=0.70156 s
+[LAAB] PyTorch | am_blocked | optimized=0.49594 s | actual=0.71689 s  | linalg_matmul=0.71648 s
+[LAAB] PyTorch | am_blocked | optimized=0.50879 s | actual=0.72019 s  | linalg_matmul=0.71660 s
+[LAAB] PyTorch | am_blocked | optimized=0.49783 s | actual=0.71635 s  | linalg_matmul=0.71467 s
+[LAAB] PyTorch | am_blocked | optimized=0.49510 s | actual=0.71368 s  | linalg_matmul=0.71473 s
+[LAAB] PyTorch | am_blocked | optimized=0.49579 s | actual=0.71511 s  | linalg_matmul=0.71500 s
+[LAAB] PyTorch | am_blocked | optimized=0.49727 s | actual=0.72217 s  | linalg_matmul=0.71850 s
+[LAAB] PyTorch | am_blocked | optimized=0.50280 s | actual=0.72335 s  | linalg_matmul=0.71868 s
+[LAAB] PyTorch | am_blocked | optimized=0.50608 s | actual=0.71607 s  | linalg_matmul=0.71552 s
+[LAAB] PyTorch | am_blocked | optimized=0.49337 s | actual=0.71443 s  | linalg_matmul=0.72153 s
+LAAB_REPS=10 LAAB_N=8000  python cm_loops.py 
+[LAAB] PyTorch | cm_loops | optimized=1.45604 s | actual=2.88417 s
+[LAAB] PyTorch | cm_loops | optimized=0.95778 s | actual=0.95965 s
+[LAAB] PyTorch | cm_loops | optimized=0.95519 s | actual=0.95371 s
+[LAAB] PyTorch | cm_loops | optimized=0.95539 s | actual=0.95889 s
+[LAAB] PyTorch | cm_loops | optimized=0.96645 s | actual=0.95281 s
+[LAAB] PyTorch | cm_loops | optimized=0.96122 s | actual=0.95432 s
+[LAAB] PyTorch | cm_loops | optimized=0.95426 s | actual=0.95758 s
+[LAAB] PyTorch | cm_loops | optimized=0.95802 s | actual=0.95080 s
+[LAAB] PyTorch | cm_loops | optimized=0.97516 s | actual=0.95399 s
+[LAAB] PyTorch | cm_loops | optimized=0.95485 s | actual=0.95408 s
+LAAB_REPS=10 LAAB_N=8000  python cm_partial_op_sum.py 
+[LAAB] PyTorch | cm_partial_op_sum | optimized=0.01685 s | actual=0.04633 s
+[LAAB] PyTorch | cm_partial_op_sum | optimized=0.01664 s | actual=0.01042 s
+[LAAB] PyTorch | cm_partial_op_sum | optimized=0.01611 s | actual=0.01020 s
+[LAAB] PyTorch | cm_partial_op_sum | optimized=0.01657 s | actual=0.01007 s
+[LAAB] PyTorch | cm_partial_op_sum | optimized=0.01591 s | actual=0.01059 s
+[LAAB] PyTorch | cm_partial_op_sum | optimized=0.01589 s | actual=0.00992 s
+[LAAB] PyTorch | cm_partial_op_sum | optimized=0.01568 s | actual=0.00995 s
+[LAAB] PyTorch | cm_partial_op_sum | optimized=0.01599 s | actual=0.00979 s
+[LAAB] PyTorch | cm_partial_op_sum | optimized=0.01584 s | actual=0.01039 s
+[LAAB] PyTorch | cm_partial_op_sum | optimized=0.01567 s | actual=0.00978 s
+LAAB_REPS=10 LAAB_N=8000  python cm_partial_op_prod.py 
+[LAAB] PyTorch | cm_partial_op_prod | optimized=0.01855 s | actual=0.73035 s
+[LAAB] PyTorch | cm_partial_op_prod | optimized=0.01864 s | actual=0.70358 s
+[LAAB] PyTorch | cm_partial_op_prod | optimized=0.02303 s | actual=0.70190 s
+[LAAB] PyTorch | cm_partial_op_prod | optimized=0.01812 s | actual=0.69730 s
+[LAAB] PyTorch | cm_partial_op_prod | optimized=0.01813 s | actual=0.69983 s
+[LAAB] PyTorch | cm_partial_op_prod | optimized=0.01806 s | actual=0.69637 s
+[LAAB] PyTorch | cm_partial_op_prod | optimized=0.01815 s | actual=0.69327 s
+[LAAB] PyTorch | cm_partial_op_prod | optimized=0.01814 s | actual=0.69825 s
+[LAAB] PyTorch | cm_partial_op_prod | optimized=0.01820 s | actual=0.70124 s
+[LAAB] PyTorch | cm_partial_op_prod | optimized=0.02275 s | actual=0.72105 s
