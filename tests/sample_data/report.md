@@ -1,14 +1,14 @@
-## LAAB-Python | CPU 
-
-### Benchmark Information
+# Report | LAAB-Python | CPU 
 
 | Framework | PyTorch/2.1.2-foss-2023a | 
 |---|---|
 | **System** | HPC2N_x86_64 |
 | **CPU** | AMD EPYC 7413 24-Core Processor | 
 
+<hr style="border: none; height: 1px; background-color: #ccc;" />
 
-### Test 1: Comparison with GEMM
+
+## Test 1: Comparison with GEMM
 
 Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
 
@@ -21,9 +21,8 @@ Description: The time taken for general matrix multiplication $A^TB$ is compared
 |$"$|`linalg.matmul(t(A),B)` | 0.507 | 0.026 | :white_check_mark: |
 |**Reference** |`sgemm`| **0.494**| | |
 
-<hr style="border: none; height: 1px; background-color: #ccc;" />
 
-### Test 2: CSE
+## Test 2: CSE
 
 a) **Repeated in summation:**
 
@@ -63,9 +62,8 @@ d) **Sub-optimal CSE**
 
 TODO
 
-<hr style="border: none; height: 1px; background-color: #ccc;" />
 
-### Test 3: Matrix chains
+## Test 3: Matrix chains
 
 a) **Right to left**:
 
@@ -103,9 +101,8 @@ Description: The input matrix chain is $H^Tyx^TH$. Here, neither left-to-right n
 |$"$|`linalg.multi_dot([t(H), y, t(x), H])`| 0.024 | 0.0 | :white_check_mark: |
 |**Reference**| `(t(H)@y)@(t(x)@H)`| **0.023**| | |
 
-<hr style="border: none; height: 1px; background-color: #ccc;" />
 
-### Test 4: Matrix properties
+## Test 4: Matrix properties
 
 a) **TRMM**
 
@@ -135,12 +132,92 @@ c) **Tri-diagonal**
 
 Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
 
-Dwscription: The input expression is $AB$, where $A$ is tri-diagonal. The reference implementation performs the matrix multiplication using the compressed sparse row format for $A$, implemented in C.
+Description: The input expression is $AB$, where $A$ is tri-diagonal. The reference implementation performs the matrix multiplication using the compressed sparse row format for $A$, implemented in C.
 
 |Expr|Call |  time (s)  | loss | result@0.05|
 |----|-----|------------|--|--|
 |$AB$|`A@B`| 0.506 | 115.294 | :x: |
 |$"$|`linalg.matmul(A,B)`| 0.508 | 115.784  | :x: |
 |**Reference** |`csr(A)@B`| **0.004**| | |
+
+
+## Test 5: Algebraic manipulations
+
+a) **Distributivity 1**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $E_1 = AB+AC$. This expression requires two $\mathcal{O}(n^3)$ matrix multiplications.  $E_1$ can be rewritten using the distributive law as $A(B+C)$, reducing the number of $\mathcal{O}(n^3)$ matrix multiplications to one.
+
+|Expr|Call| time (s)| loss | result@0.05 |
+|----|---|----------|--|--|
+|$E_1$|`A@B + A@C`| 1.033 | 0.969| :x: |
+|**Reference**|`A@(B+C)`|**0.525**| | |
+
+b) **Distributivity 2**
+
+Operands: $A, H \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $E_2 = (A - H^TH)x$, which involves one $\mathcal{O}(n^3)$ matrix multiplication. This expression can be rewritten as $Ax - H^T(Hx)$, thereby avoiding the $\mathcal{O}(n^3)$ matrix multiplcation. 
+
+|Expr|Call| time (s)| loss | result@0.05 |
+|----|---|----------|--|--|
+|$E_2$|`(A - t(H)@H)@x`| 0.528 | 55.615| :x: |
+|**Reference**|`A@x - t(H)@(H@x)`|**0.009**| | |
+
+c) **Blocked matrix**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $AB$, where $A$ consists of two blocks along the diagnonal, each of size $1500 \times 1500$.
+
+|Expr|Call| time (s)| loss | result@0.05 |
+|----|---|----------|--|--|
+|$AB$|`A@B`| 0.496 | 0.889 | :x: |
+|$"$|`linalg.matmul(A,B)` | 0.507 | 0.93 | :x: |
+|**Reference**|`blocked matrix multiply`|**0.263**| | |
+
+
+## Test 6: Code motion
+
+a) **Loop-invariant code motion**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $AB$ computed inside a loop. The reference implementation moves the repeated multiplication outside the loop.
+
+||Call| time (s)| loss | result@0.05 |
+|----|---|----------|--|--|
+||`for i in range(3):` <br> `   A@B + tensordot(V[i],t(V[i])`| 0.546 |  0.004 | :white_check_mark: |
+|**Reference**|`S=A@B;` <br> `for i in range(3):` <br>`   S+tensordot(V[i],t(V[i]) `|**0.544**| | | 
+
+b) **Partial operand access in sum**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $(A+B)[2,2]$, which requires only single element of both the matrices. The  reference implementation avoids the explicit addition of the full matrices. 
+
+||Call| time (s)| loss | result@0.05 |
+|----|---|----------|--|--|
+||`(A+B)[2,2]`| 0.015 | 6.729 | :x: |
+|**Reference**|`A[2]+B[2]`|**0.002**| | |
+
+c) **Partial operand access in product**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $(AB)[2,2]$, which requires only single element of both the matrices. The  reference implementation avoids the explicit multiplication of the full matrices. 
+
+||Call| time (s)| loss | result@0.05 |
+|----|---|----------|--|--|
+||`(A@B)[2,2]`| 0.504 | 234.327 | :x: |
+|**Reference**|`dot(A[2,:],B[:,2])`|**0.002**| | |
+
+
+## OVERALL RESULT
+
+### Mean loss: 26.034 
+
+### Score: 6 / 16
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />

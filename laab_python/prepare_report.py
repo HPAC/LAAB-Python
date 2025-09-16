@@ -47,9 +47,10 @@ def prepare_markdown_report(laab_results, template_file, outfile, cutoff=0.05):
         "system": laab_results.system,
         "cpu_model": laab_results.cpu_model,
         "losses": format_floats_recursive(losses,prec),
-        "mean_loss": mean_loss,
+        "mean_loss": f"{mean_loss:.{prec}f}",
         "cutoff_results": format_cutoff_results_md(cutoff_results),
         "score": score,
+        "num_tests": len(losses),
         "times": format_floats_recursive(min_exec_times,prec),
         "cutoff": f"{cutoff:.2f}"
     }

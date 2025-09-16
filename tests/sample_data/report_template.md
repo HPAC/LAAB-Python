@@ -1,14 +1,14 @@
-## LAAB-Python | CPU 
-
-### Benchmark Information
+# Report | LAAB-Python | CPU 
 
 | Framework | {{ eb_name }} | 
 |---|---|
 | **System** | {{ system }} |
 | **CPU** | {{ cpu_model }} | 
 
+<hr style="border: none; height: 1px; background-color: #ccc;" />
 
-### Test 1: Comparison with GEMM
+
+## Test 1: Comparison with GEMM
 
 Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
 
@@ -21,9 +21,8 @@ Description: The time taken for general matrix multiplication $A^TB$ is compared
 |$"$|`linalg.matmul(t(A),B)` | {{ times.sgemm.tests.linalg_matmul }} | {{ losses.sgemm.linalg_matmul }} | {{ cutoff_results.sgemm.linalg_matmul }} |
 |**Reference** |`sgemm`| **{{ times.sgemm.optimized }}**| | |
 
-<hr style="border: none; height: 1px; background-color: #ccc;" />
 
-### Test 2: CSE
+## Test 2: CSE
 
 a) **Repeated in summation:**
 
@@ -63,9 +62,8 @@ d) **Sub-optimal CSE**
 
 TODO
 
-<hr style="border: none; height: 1px; background-color: #ccc;" />
 
-### Test 3: Matrix chains
+## Test 3: Matrix chains
 
 a) **Right to left**:
 
@@ -103,9 +101,8 @@ Description: The input matrix chain is $H^Tyx^TH$. Here, neither left-to-right n
 |$"$|`linalg.multi_dot([t(H), y, t(x), H])`| {{ times.matchain_mixed.tests.linalg_multidot }} | {{ losses.matchain_mixed.linalg_multidot }} | {{ cutoff_results.matchain_mixed.linalg_multidot }} |
 |**Reference**| `(t(H)@y)@(t(x)@H)`| **{{ times.matchain_mixed.optimized }}**| | |
 
-<hr style="border: none; height: 1px; background-color: #ccc;" />
 
-### Test 4: Matrix properties
+## Test 4: Matrix properties
 
 a) **TRMM**
 
@@ -135,12 +132,92 @@ c) **Tri-diagonal**
 
 Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
 
-Dwscription: The input expression is $AB$, where $A$ is tri-diagonal. The reference implementation performs the matrix multiplication using the compressed sparse row format for $A$, implemented in C.
+Description: The input expression is $AB$, where $A$ is tri-diagonal. The reference implementation performs the matrix multiplication using the compressed sparse row format for $A$, implemented in C.
 
 |Expr|Call |  time (s)  | loss | result@{{ cutoff }}|
 |----|-----|------------|--|--|
 |$AB$|`A@B`| {{ times.mp_tridiag.tests.actual }} | {{ losses.mp_tridiag.actual }} | {{ cutoff_results.mp_tridiag.actual }} |
 |$"$|`linalg.matmul(A,B)`| {{ times.mp_tridiag.tests.linalg_matmul }} | {{ losses.mp_tridiag.linalg_matmul }}  | {{ cutoff_results.mp_tridiag.linalg_matmul }} |
 |**Reference** |`csr(A)@B`| **{{ times.mp_tridiag.optimized }}**| | |
+
+
+## Test 5: Algebraic manipulations
+
+a) **Distributivity 1**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $E_1 = AB+AC$. This expression requires two $\mathcal{O}(n^3)$ matrix multiplications.  $E_1$ can be rewritten using the distributive law as $A(B+C)$, reducing the number of $\mathcal{O}(n^3)$ matrix multiplications to one.
+
+|Expr|Call| time (s)| loss | result@{{ cutoff }} |
+|----|---|----------|--|--|
+|$E_1$|`A@B + A@C`| {{ times.am_distributivity1.tests.actual }} | {{ losses.am_distributivity1.actual }}| {{ cutoff_results.am_distributivity1.actual }} |
+|**Reference**|`A@(B+C)`|**{{ times.am_distributivity1.optimized }}**| | |
+
+b) **Distributivity 2**
+
+Operands: $A, H \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $E_2 = (A - H^TH)x$, which involves one $\mathcal{O}(n^3)$ matrix multiplication. This expression can be rewritten as $Ax - H^T(Hx)$, thereby avoiding the $\mathcal{O}(n^3)$ matrix multiplcation. 
+
+|Expr|Call| time (s)| loss | result@{{ cutoff }} |
+|----|---|----------|--|--|
+|$E_2$|`(A - t(H)@H)@x`| {{ times.am_distributivity2.tests.actual }} | {{ losses.am_distributivity2.actual }}| {{ cutoff_results.am_distributivity2.actual }} |
+|**Reference**|`A@x - t(H)@(H@x)`|**{{ times.am_distributivity2.optimized }}**| | |
+
+c) **Blocked matrix**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $AB$, where $A$ consists of two blocks along the diagnonal, each of size $1500 \times 1500$.
+
+|Expr|Call| time (s)| loss | result@{{ cutoff }} |
+|----|---|----------|--|--|
+|$AB$|`A@B`| {{ times.am_blocked.tests.actual }} | {{ losses.am_blocked.actual }} | {{ cutoff_results.am_blocked.actual }} |
+|$"$|`linalg.matmul(A,B)` | {{ times.am_blocked.tests.linalg_matmul }} | {{ losses.am_blocked.linalg_matmul }} | {{ cutoff_results.am_blocked.linalg_matmul }} |
+|**Reference**|`blocked matrix multiply`|**{{ times.am_blocked.optimized }}**| | |
+
+
+## Test 6: Code motion
+
+a) **Loop-invariant code motion**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $AB$ computed inside a loop. The reference implementation moves the repeated multiplication outside the loop.
+
+||Call| time (s)| loss | result@{{ cutoff }} |
+|----|---|----------|--|--|
+||`for i in range(3):` <br> `   A@B + tensordot(V[i],t(V[i])`| {{ times.cm_loops.tests.actual }} |  {{ losses.cm_loops.actual }} | {{ cutoff_results.cm_loops.actual }} |
+|**Reference**|`S=A@B;` <br> `for i in range(3):` <br>`   S+tensordot(V[i],t(V[i]) `|**{{ times.cm_loops.optimized }}**| | | 
+
+b) **Partial operand access in sum**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $(A+B)[2,2]$, which requires only single element of both the matrices. The  reference implementation avoids the explicit addition of the full matrices. 
+
+||Call| time (s)| loss | result@{{ cutoff }} |
+|----|---|----------|--|--|
+||`(A+B)[2,2]`| {{ times.cm_partial_op_sum.tests.actual }} | {{ losses.cm_partial_op_sum.actual }} | {{ cutoff_results.cm_partial_op_sum.actual }} |
+|**Reference**|`A[2]+B[2]`|**{{ times.cm_partial_op_sum.optimized }}**| | |
+
+c) **Partial operand access in product**
+
+Operands: $A, B \in \mathbb{R}^{3000 \times 3000}$
+
+Description: The input expression is $(AB)[2,2]$, which requires only single element of both the matrices. The  reference implementation avoids the explicit multiplication of the full matrices. 
+
+||Call| time (s)| loss | result@{{ cutoff }} |
+|----|---|----------|--|--|
+||`(A@B)[2,2]`| {{ times.cm_partial_op_prod.tests.actual }} | {{ losses.cm_partial_op_prod.actual }} | {{ cutoff_results.cm_partial_op_prod.actual }} |
+|**Reference**|`dot(A[2,:],B[:,2])`|**{{ times.cm_partial_op_prod.optimized }}**| | |
+
+
+## OVERALL RESULT
+
+### Mean loss: {{ mean_loss }} 
+
+### Score: {{ score }} / {{ num_tests }}
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
