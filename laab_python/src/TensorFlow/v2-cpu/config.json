@@ -1,0 +1,109 @@
+{
+    "sgemm":{
+        "tests":{
+            "actual": "transpose(A)@B",
+            "linalg_matmul": "linalg.matmul(t(A),B)"
+        },
+        "optimized": "sgemm"
+    },
+    "cse_addition":{
+        "tests":{
+            "actual": "transpose(A)@B + transpose(A)@B"
+        },
+        "optimized": "2*(transpose(A)@B)"
+    },
+    "cse_matmul_paranthesis":{
+        "tests":{
+            "actual": "transpose(transpose(A)@B)@(transpose(A)@B)"
+        },
+        "optimized": "S=transpose(A)@B; transpose(S)@S"
+    },
+    "cse_matmul_no_paranthesis":{
+        "tests":{
+            "actual": "transpose(transpose(A)@B)@transpose(A)@B"
+        },
+        "optimized": "S=transpose(A)@B; transpose(S)@S"
+    },
+    "cse_suboptimal":{
+        "tests":{
+            "actual": "transpose(A)@B@transpose(A)@B@y"
+        },
+        "optimized": "transpose(A)@(B@(transpose(A)@(B@y))"
+    },
+    "matchain_rtol":{
+        "tests":{
+            "actual": "transpose(H)@H@x"
+        },
+        "optimized": "transpose(H)@(H@x)"
+    },
+    "matchain_ltor":{
+        "tests": {
+            "actual": "transpose(y)@transpose(H)@H"
+        },
+        "optimized": "(transpose(y)@transpose(H))@H"
+    },
+    "matchain_mixed":{
+        "tests": {
+            "actual": "transpose(H)@y@transpose(x)@H"
+        },
+        "optimized": "(transpose(H)@y)@(transpose(x)@H)"
+    },
+    "mp_trmm":{
+        "tests": {
+            "actual": "A@B",
+            "linalg_matmul": "linalg.matmul(A,B)"
+        },
+        "optimized": "trmm"
+    },
+    "mp_syrk":{
+        "tests": {
+            "actual": "A@B",
+            "linalg_matmul": "linalg.matmul(A,B)"
+        },
+        "optimized": "syrk"
+    },
+    "mp_tridiag":{
+        "tests": {
+            "actual": "A@B",
+            "linalg_matmul": "linalg.matmul(A,B)"
+        },
+        "optimized": "csr(A)@B"
+    },
+    "am_distributivity1":{
+        "tests": {
+            "actual": "A@B+ A@C"
+        },
+        "optimized": "A@(B+C)"
+    },
+    "am_distributivity2":{
+        "tests": {
+            "actual": "(A - transpose(H)@H)@x"
+        },
+        "optimized": "A@x - transpose(H)@(H@x)"
+    },
+    "am_blocked":{
+        "tests": {
+            "actual": "A@B",
+            "linalg_matmul": "linalg.matmul(A,B)"
+        },
+        "optimized": "blocked matrix multiply"
+    },
+    "cm_loops":{
+        "tests": {
+            "actual": "for i in range(3): A@B ..."
+        },
+        "optimized": "A@B; for i in range(3): ..."
+    },
+    "cm_partial_op_sum":{
+        "tests": {
+            "actual": "(A+B)[2,2]"
+        },
+        "optimized": "A[2,2] + B[2,2]"
+    },
+    "cm_partial_op_prod":{
+        "tests": {
+            "actual": "(A@B)[2,2]"
+        },
+        "optimized": "dot(A[2,:],B[:,2])"
+    }
+}
