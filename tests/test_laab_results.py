@@ -2,7 +2,7 @@ from laab_python.laab_results import LAABResults
 
 def test1():
     
-    data_file = "tests/sample_data/data.txt"
+    data_file = "tests/sample_data/data_pyt.txt"
     eb_version = "PyTorch/2.1.2-foss-2023a"
     system = "HPC2N_x86_64"
 

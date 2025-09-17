@@ -3,11 +3,12 @@ import numpy as np
 from types import SimpleNamespace
 
 class LAABResults:
-    def __init__(self, data_file, eb_version, system):
+    def __init__(self, data_file, eb_version, system, delta=0.002):
         self.eb_version = eb_version
         self.system = system
         self.cpu_model =  ""
         self.data = {}
+        self.delta = delta
         
         self._prepare(data_file)
         
@@ -41,6 +42,7 @@ class LAABResults:
             value = float(record[i].split('=')[1].split(' ')[0].strip())
             
             if test == "optimized":
+                value = max(value, self.delta)
                 self.data[exp]['optimized'].append(value)
             else:
                 if not test in self.data[exp]['tests']:
@@ -63,12 +65,13 @@ class LAABResults:
     
     def _loss_fn(self, vals, ref_vals, q_min=25, q_max=75):
         vals_q = np.percentile(vals, [q_min, q_max])
+        # ref_vals = [max(x, delta) for x in ref_vals]
         ref_vals_q = np.percentile(ref_vals, [q_min, q_max])
         
         loss = 0.0
         if vals_q[0] > ref_vals_q[1]:
             # loss is diff in median
-            loss = (np.min(vals) - np.min(ref_vals)) / np.min(ref_vals)
+            loss = (np.median(vals) - np.median(ref_vals)) / np.median(ref_vals)
         
         return loss
     

@@ -13,6 +13,7 @@ SCRIPTS = \
 	cse_addition.py \
 	cse_matmul_paranthesis.py \
 	cse_matmul_no_paranthesis.py \
+	cse_suboptimal.py \
 	matchain_ltor.py \
 	matchain_rtol.py \
 	matchain_mixed.py \

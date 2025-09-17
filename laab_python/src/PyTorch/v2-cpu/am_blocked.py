@@ -38,6 +38,9 @@ if __name__ == "__main__":
     B = torch.cat((B1,B2),dim=0)
 
     for i in range(reps):
+        #cache scrub 300MB
+        _ = bytearray(300*1024*1024); _[:] = b'0'
+        
         start = time.perf_counter()
         ret1 = actual(A,B)
         end = time.perf_counter()

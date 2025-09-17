@@ -34,6 +34,9 @@ if __name__ == "__main__":
 
 
     for i in range(reps):
+        #cache scrub 300MB
+        _ = bytearray(300*1024*1024); _[:] = b'0'
+        
         start = time.perf_counter()
         ret = actual(H,y).block_until_ready()
         end = time.perf_counter()

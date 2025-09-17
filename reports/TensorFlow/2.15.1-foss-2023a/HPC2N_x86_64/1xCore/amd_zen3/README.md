@@ -21,7 +21,7 @@ Description: The time taken for general matrix multiplication $A^TB$ is compared
 ||Call  |  time (s)  | loss | result@0.10 | 
 |----|------|------------|--|---|
 |$A^TB$|`transpose(A)@B`| 0.519 | 0.052| :white_check_mark: |
-|$"$|`linalg.matmul(t(A),B)` | 0.519 | 0.053 | :white_check_mark: |
+|$"$|`linalg.matmul(t(A),B)` | 0.519 | 0.052 | :white_check_mark: |
 |**Reference** |`sgemm`| **0.493**| | |
 
 
@@ -58,7 +58,7 @@ Description: The input expression is $E_3 = (A^TB)^TA^TB$. The reference impleme
 
 |Expr|Call | time (s) | loss | result@0.10 |
 |-----|-----|----------|--|--|
-|$E_3$|`transpose(transpose(A)@B)@transpose(A)@B`| 1.587 |  0.512 | :x: |
+|$E_3$|`transpose(transpose(A)@B)@transpose(A)@B`| 1.587 |  0.522 | :x: |
 |**Reference**| `S=transpose(A)@B; transpose(S)@S`| **1.05**| | |
 
 d) **Sub-optimal CSE**
@@ -69,7 +69,7 @@ Description: The input expression is $E_4 = A^TBA^TBy$. The reference implementa
 
 |Expr|Call | time (s) | loss | result@0.10 |
 |-----|-----|----------|--|--|
-|$E_4$|`transpose(A)@B@transpose(A)@B@y`| 1.581 |  311.532 | :x: |
+|$E_4$|`transpose(A)@B@transpose(A)@B@y`| 1.581 |  253.912 | :x: |
 |**Reference**| `transpose(A)@(B@(transpose(A)@(B@y))`| **0.005**| | |
 
 ## Test 3: Matrix chains
@@ -82,7 +82,7 @@ Description: The input matrix chain is $H^THx$. The reference implementation, ev
 
 |Expr|Call| time (s)| loss | result@0.10 |
 |----|----|---------|--|--|
-|$H^THx$|`transpose(H)@H@x`| 0.523 | 164.142 | :x: | 
+|$H^THx$|`transpose(H)@H@x`| 0.523 | 154.595 | :x: | 
 |**Reference**| `transpose(H)@(H@x)`| **0.003**| | |
 
 b) **Left to right**:
@@ -104,7 +104,7 @@ Description: The input matrix chain is $H^Tyx^TH$. Here, neither left-to-right n
 
 |Expr|Call| time (s) | loss | result@0.10 |
 |----|----|-----------|--|--|
-|$H^Tyx^TH$|`transpose(H)@y@transpose(x)@H`| 0.538 | 8.716 | :x: | 
+|$H^Tyx^TH$|`transpose(H)@y@transpose(x)@H`| 0.538 | 8.661 | :x: | 
 |**Reference**| `(transpose(H)@y)@(transpose(x)@H)`| **0.055**| | |
 
 
@@ -118,8 +118,8 @@ Description: The input expression is $AB$, where $A$ is lower triangular. The re
 
 |Expr|Call |  time (s)  | loss | result@0.10|
 |----|-----|------------|--|--|
-|$AB$|`A@B`| 0.519 | 1.11 | :x: |
-|$"$|`linalg.matmul(A,B)`| 0.519 | 1.11  | :x: |
+|$AB$|`A@B`| 0.519 | 1.109 | :x: |
+|$"$|`linalg.matmul(A,B)`| 0.519 | 1.109  | :x: |
 |**Reference** |`trmm`| **0.246**| | |
 
 b) **SYRK**
@@ -130,8 +130,8 @@ Description: The input expression is $AB$, where $A$ is transpose of  $B$. The r
 
 |Expr|Call |  time (s)  | loss | result@0.10|
 |----|-----|------------|--|--|
-|$AB$|`A@B`| 0.533 | 1.1 | :x: |
-|$"$|`linalg.matmul(A,B)`| 0.534 | 1.102  | :x: |
+|$AB$|`A@B`| 0.533 | 1.098 | :x: |
+|$"$|`linalg.matmul(A,B)`| 0.534 | 1.097  | :x: |
 |**Reference** |`syrk`| **0.254**| | |
 
 c) **Tri-diagonal**
@@ -142,9 +142,9 @@ Description: The input expression is $AB$, where $A$ is tri-diagonal. The refere
 
 |Expr|Call |  time (s)  | loss | result@0.10|
 |----|-----|------------|--|--|
-|$AB$|`A@B`| 0.518 | 116.535 | :x: |
-|$"$|`linalg.matmul(A,B)`| 0.519 | 116.694  | :x: | 
-|$"$|`linalg.tridiagonal_matmul(A,B)`| 0.023 | 4.104  | :x: | 
+|$AB$|`A@B`| 0.518 | 116.409 | :x: |
+|$"$|`linalg.matmul(A,B)`| 0.519 | 116.544  | :x: | 
+|$"$|`linalg.tridiagonal_matmul(A,B)`| 0.023 | 4.258  | :x: | 
 |**Reference** |`csr(A)@B`| **0.004**| | |
 
 
@@ -158,7 +158,7 @@ Description: The input expression is $E_1 = AB+AC$. This expression requires two
 
 |Expr|Call| time (s)| loss | result@0.10 |
 |----|---|----------|--|--|
-|$E_1$|`A@B+ A@C`| 1.04 | 0.937| :x: |
+|$E_1$|`A@B+ A@C`| 1.04 | 0.932| :x: |
 |**Reference**|`A@(B+C)`|**0.537**| | |
 
 b) **Distributivity 2**
@@ -169,7 +169,7 @@ Description: The input expression is $E_2 = (A - H^TH)x$, which involves one $\m
 
 |Expr|Call| time (s)| loss | result@0.10 |
 |----|---|----------|--|--|
-|$E_2$|`(A - transpose(H)@H)@x`| 0.526 | 134.159| :x: |
+|$E_2$|`(A - transpose(H)@H)@x`| 0.526 | 107.723| :x: |
 |**Reference**|`A@x - transpose(H)@(H@x)`|**0.004**| | |
 
 c) **Blocked matrix**
@@ -180,8 +180,8 @@ Description: The input expression is $AB$, where $A$ consists of two blocks alon
 
 |Expr|Call| time (s)| loss | result@0.10 |
 |----|---|----------|--|--|
-|$AB$|`A@B`| 0.519 | 0.972 | :x: |
-|$"$|`linalg.matmul(A,B)` | 0.519 | 0.971 | :x: |
+|$AB$|`A@B`| 0.519 | 0.894 | :x: |
+|$"$|`linalg.matmul(A,B)` | 0.519 | 0.891 | :x: |
 |**Reference**|`blocked matrix multiply`|**0.263**| | |
 
 
@@ -206,7 +206,7 @@ Description: The input expression is $(A+B)[2,2]$, which requires only single el
 
 ||Call| time (s)| loss | result@0.10 |
 |----|---|----------|--|--|
-||`(A+B)[2,2]`| 0.017 | 71.875 | :x: |
+||`(A+B)[2,2]`| 0.017 | 68.373 | :x: |
 |**Reference**|`A[2,2] + B[2,2]`|**0.0**| | |
 
 c) **Partial operand access in product**
@@ -217,13 +217,13 @@ Description: The input expression is $(AB)[2,2]$, which requires only single ele
 
 ||Call| time (s)| loss | result@0.10 |
 |----|---|----------|--|--|
-||`(A@B)[2,2]`| 0.518 | 1035.64 | :x: |
+||`(A@B)[2,2]`| 0.518 | 684.441 | :x: |
 |**Reference**|`dot(A[2,:],B[:,2])`|**0.001**| | |
 
 
 ## OVERALL RESULT
 
-### Mean loss: 102.050 
+### Mean loss: 75.680 
 
 ### Score: 5 / 17
 

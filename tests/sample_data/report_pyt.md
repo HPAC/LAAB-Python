@@ -1,4 +1,4 @@
-# Report | LAAB-Python | 1xCPU-Core 
+# Report | LAAB-Python | 1xCore 
 
 | Framework | PyTorch/2.1.2-foss-2023a | 
 |---|---|

@@ -1,6 +1,6 @@
 # Report | LAAB-Python | 1xCPU-Core 
 
-| Framework | PyTorch/2.1.2-foss-2023a | 
+| Framework | Jax/0.4.25-gfbf-2023a | 
 |---|---|
 | **System** | HPC2N_x86_64 |
 | **CPU** | AMD EPYC 7413 24-Core Processor | 
@@ -20,8 +20,8 @@ Description: The time taken for general matrix multiplication $A^TB$ is compared
 
 ||Call  |  time (s)  | loss | result@0.10 | 
 |----|------|------------|--|---|
-|$A^TB$|`t(A)@B`| 0.508 | 0.027| :white_check_mark: |
-|$"$|`linalg.matmul(t(A),B)` | 0.512 | 0.033 | :white_check_mark: |
+|$A^TB$|`transpose(A)@B`| 0.507 | 0.035| :white_check_mark: |
+|$"$|`jax.numpy.matmul(t(A),B)` |  |  |  |
 |**Reference** |`sgemm`| **0.495**| | |
 
 
@@ -35,8 +35,8 @@ Description: The input expression is $E_1 = A^TB + A^TB$. The subexpression $A^T
 
 |Expr |Call |time (s) | loss | result@0.10 |
 |-----|-----|----------|--|--|
-|$E_1$ |`t(A)@B + t(A)@B` | 0.523 | 0.0| :white_check_mark: | 
-|**Reference**| `2*(t(A)@B)`| **0.523**| | |
+|$E_1$ |`transpose(A)@B + transpose(A)@B` | 1.015 | 0.0| :white_check_mark: | 
+|**Reference**| `2*(transpose(A)@B)`| **1.016**| | |
 
 
 b) **Repeated in multiplication (parenthesis)**
@@ -47,8 +47,8 @@ Description: The input expression is $E_2 = (A^TB)^T(A^TB)$. The reference imple
 
 |Expr|Call | time (s) | loss | result@0.10 |
 |-----|-----|----------|--|--|
-|$E_2$|`t(t(A)@B)@(t(A)@B)`| 1.02 | 0.0 | :white_check_mark: |
-|**Reference**| `S=t(A)@B; t(S)@S`| **1.021**| | |
+|$E_2$|`transpose(transpose(A)@B)@(transpose(A)@B)`| 1.524 | 0.513 | :x: |
+|**Reference**| `S=transpose(A)@B; transpose(S)@S`| **1.015**| | |
 
 c) **Repeated in multiplication (no parenthesis)**
 
@@ -58,8 +58,8 @@ Description: The input expression is $E_3 = (A^TB)^TA^TB$. The reference impleme
 
 |Expr|Call | time (s) | loss | result@0.10 |
 |-----|-----|----------|--|--|
-|$E_3$|`t(t(A)@B)@t(A)@B`| 1.526 |  0.504 | :x: |
-|**Reference**| `S=t(A)@B; t(S)@S`| **1.021**| | |
+|$E_3$|`transpose(transpose(A)@B)@transpose(A)@B`| 1.506 |  0.513 | :x: |
+|**Reference**| `S=transpose(A)@B; transpose(S)@S`| **1.015**| | |
 
 d) **Sub-optimal CSE**
 
@@ -69,8 +69,8 @@ Description: The input expression is $E_4 = A^TBA^TBy$. The reference implementa
 
 |Expr|Call | time (s) | loss | result@0.10 |
 |-----|-----|----------|--|--|
-|$E_4$|`t(A)@B@t(A)@B@y`| 1.528 |  112.417 | :x: |
-|**Reference**| `t(A)@(B@(t(A)@(B@y))`| **0.013**| | |
+|$E_4$|`transpose(A)@B@transpose(A)@B@y`| 1.506 |  36.396 | :x: |
+|**Reference**| `transpose(A)@(B@(transpose(A)@(B@y))`| **0.04**| | |
 
 ## Test 3: Matrix chains
 
@@ -82,9 +82,9 @@ Description: The input matrix chain is $H^THx$. The reference implementation, ev
 
 |Expr|Call| time (s)| loss | result@0.10 |
 |----|----|---------|--|--|
-|$H^THx$|`t(H)@H@x`| 0.51 | 95.092 | :x: | 
-|$"$|`linalg.multi_dot([t(H), H, x])`| 0.006 | 0.19 | :x: |  
-|**Reference**| `t(H)@(H@x)`| **0.005**| | |
+|$H^THx$|`transpose(H)@H@x`| 0.509 | 24.818 | :x: | 
+|$"$|`linalg.multi_dot([transpose(H), H, x])`| 0.02 | 0.04 | :white_check_mark: |  
+|**Reference**| `transpose(H)@(H@x)`| **0.019**| | |
 
 b) **Left to right**:
 
@@ -94,9 +94,9 @@ Description: The input matrix chain is $y^TH^TH$. The reference implementation, 
 
 |Expr|Call | time (s)| loss | result@0.10 |
 |----|-----|---------|--|--|
-|$y^TH^TH$|`t(y)@t(H)@H`| 0.006 | 0.0 | :white_check_mark: |  
-|$"$|`linalg.multi_dot([t(y), t(H), H])`| 0.006 | 0.0 | :white_check_mark: | 
-|**Reference**| `(t(y)@t(H))@H`| **0.006**| | |
+|$y^TH^TH$|`transpose(y)@transpose(H)@H`| 0.011 | 0.039 | :white_check_mark: |  
+|$"$|`linalg.multi_dot([transpose(y), transpose(H), H])`| 0.011 | 0.024 | :white_check_mark: | 
+|**Reference**| `(transpose(y)@transpose(H))@H`| **0.011**| | |
 
 c) **Mixed**:
 
@@ -106,9 +106,9 @@ Description: The input matrix chain is $H^Tyx^TH$. Here, neither left-to-right n
 
 |Expr|Call| time (s) | loss | result@0.10 |
 |----|----|-----------|--|--|
-|$H^Tyx^TH$|`t(H)@y@t(x)@H`| 0.527 | 20.589 | :x: | 
-|$"$|`linalg.multi_dot([t(H), y, t(x), H])`| 0.025 | 0.027 | :white_check_mark: | 
-|**Reference**| `(t(H)@y)@(t(x)@H)`| **0.024**| | |
+|$H^Tyx^TH$|`transpose(H)@y@transpose(x)@H`| 0.543 | 14.231 | :x: | 
+|$"$|`linalg.multi_dot([transpose(H), y, transpose(x), H])`| 0.037 | 0.062 | :white_check_mark: | 
+|**Reference**| `(transpose(H)@y)@(transpose(x)@H)`| **0.036**| | |
 
 
 ## Test 4: Matrix properties
@@ -121,9 +121,9 @@ Description: The input expression is $AB$, where $A$ is lower triangular. The re
 
 |Expr|Call |  time (s)  | loss | result@0.10|
 |----|-----|------------|--|--|
-|$AB$|`A@B`| 0.505 | 1.047 | :x: |
-|$"$|`linalg.matmul(A,B)`| 0.508 | 1.059  | :x: |
-|**Reference** |`trmm`| **0.247**| | |
+|$AB$|`A@B`| 0.507 | 1.078 | :x: |
+|$"$|`jax.numpy.matmul(A,B)`|  |   |  |
+|**Reference** |`trmm`| **0.248**| | |
 
 b) **SYRK**
 
@@ -133,9 +133,9 @@ Description: The input expression is $AB$, where $A$ is transpose of  $B$. The r
 
 |Expr|Call |  time (s)  | loss | result@0.10|
 |----|-----|------------|--|--|
-|$AB$|`A@B`| 0.506 | 1.002 | :x: |
-|$"$|`linalg.matmul(A,B)`| 0.509 | 1.015  | :x: |
-|**Reference** |`syrk`| **0.253**| | |
+|$AB$|`A@B`| 0.507 | 0.997 | :x: |
+|$"$|`jax.numpy.matmul(A,B)`|  |   |  |
+|**Reference** |`syrk`| **0.255**| | |
 
 c) **Tri-diagonal**
 
@@ -145,8 +145,8 @@ Description: The input expression is $AB$, where $A$ is tri-diagonal. The refere
 
 |Expr|Call |  time (s)  | loss | result@0.10|
 |----|-----|------------|--|--|
-|$AB$|`A@B`| 0.508 | 114.684 | :x: |
-|$"$|`linalg.matmul(A,B)`| 0.511 | 115.46  | :x: | 
+|$AB$|`A@B`| 0.51 | 115.495 | :x: |
+|$"$|`jax.numpy.matmul(A,B)`|  |   |  | 
 |**Reference** |`csr(A)@B`| **0.004**| | |
 
 
@@ -160,8 +160,8 @@ Description: The input expression is $E_1 = AB+AC$. This expression requires two
 
 |Expr|Call| time (s)| loss | result@0.10 |
 |----|---|----------|--|--|
-|$E_1$|`A@B+ A@C`| 1.042 | 0.965| :x: |
-|**Reference**|`A@(B+C)`|**0.528**| | |
+|$E_1$|`A@B+ A@C`| 1.03 | 0.934| :x: |
+|**Reference**|`A@(B+C)`|**0.532**| | |
 
 b) **Distributivity 2**
 
@@ -171,8 +171,8 @@ Description: The input expression is $E_2 = (A - H^TH)x$, which involves one $\m
 
 |Expr|Call| time (s)| loss | result@0.10 |
 |----|---|----------|--|--|
-|$E_2$|`(A - t(H)@H)@x`| 0.527 | 53.393| :x: |
-|**Reference**|`A@x - t(H)@(H@x)`|**0.01**| | |
+|$E_2$|`(A - transpose(H)@H)@x`| 0.516 | 22.734| :x: |
+|**Reference**|`A@x - transpose(H)@(H@x)`|**0.022**| | |
 
 c) **Blocked matrix**
 
@@ -182,9 +182,9 @@ Description: The input expression is $AB$, where $A$ consists of two blocks alon
 
 |Expr|Call| time (s)| loss | result@0.10 |
 |----|---|----------|--|--|
-|$AB$|`A@B`| 0.497 | 0.878 | :x: |
-|$"$|`linalg.matmul(A,B)` | 0.509 | 0.876 | :x: |
-|**Reference**|`blocked matrix multiply`|**0.264**| | |
+|$AB$|`A@B`| 0.507 | 0.775 | :x: |
+|$"$|`jax.numpy.matmul(A,B)` |  |  |  |
+|**Reference**|`blocked matrix multiply`|**0.281**| | |
 
 
 ## Test 6: Code motion
@@ -197,8 +197,8 @@ Description: The input expression is $AB$ computed inside a loop. The reference 
 
 ||Call| time (s)| loss | result@0.10 |
 |----|---|----------|--|--|
-||`for i in range(3): A@B ...`| 0.544 |  0.0 | :white_check_mark: |
-|**Reference**|`A@B; for i in range(3): ...`|**0.545**| | | 
+||`for i in range(3): A@B ...`| 0.526 |  0.0 | :white_check_mark: |
+|**Reference**|`A@B; for i in range(3): ...`|**0.527**| | | 
 
 b) **Partial operand access in sum**
 
@@ -208,7 +208,7 @@ Description: The input expression is $(A+B)[2,2]$, which requires only single el
 
 ||Call| time (s)| loss | result@0.10 |
 |----|---|----------|--|--|
-||`(A+B)[2,2]`| 0.016 | 6.639 | :x: |
+||`(A+B)[2,2]`| 0.0 | 0.0 | :white_check_mark: |
 |**Reference**|`A[2,2] + B[2,2]`|**0.002**| | |
 
 c) **Partial operand access in product**
@@ -219,14 +219,14 @@ Description: The input expression is $(AB)[2,2]$, which requires only single ele
 
 ||Call| time (s)| loss | result@0.10 |
 |----|---|----------|--|--|
-||`(A@B)[2,2]`| 0.503 | 200.199 | :x: |
+||`(A@B)[2,2]`| 0.509 | 259.1 | :x: |
 |**Reference**|`dot(A[2,:],B[:,2])`|**0.002**| | |
 
 
 ## OVERALL RESULT
 
-### Mean loss: 28.939 
+### Mean loss: 25.740 
 
-### Score: 6 / 17
+### Score: 7 / 17
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
