@@ -4,13 +4,18 @@ import os
 import time
 
 @jax.jit
-def actual(A,B):
+def operator(A,B):
     ret = (A+B)[2,2]
     return ret
 
 @jax.jit
-def optimized(A,B):
+def ref_positive(A,B):
     ret = A[2,2]+B[2,2]
+    return ret
+
+@jax.jit
+def ref_negative(A,B):
+    ret = A+B
     return ret
 
 if __name__ == "__main__":
@@ -31,13 +36,20 @@ if __name__ == "__main__":
         _ = bytearray(300*1024*1024); _[:] = b'0'
         
         start = time.perf_counter()
-        ret1 = actual(A,B).block_until_ready()
+        ret1 = operator(A,B).block_until_ready()
         end = time.perf_counter()
-        elapsed_actual = end-start
+        elapsed_operator = end-start
         
         start = time.perf_counter()
-        ret1 = optimized(A,B).block_until_ready()
+        ret1 = ref_positive(A,B).block_until_ready()
         end = time.perf_counter()
-        elapsed_optimized = end-start
+        elapsed_ref_positive = end-start
+        
+        start = time.perf_counter()
+        ret1 = ref_negative(A,B).block_until_ready()
+        end = time.perf_counter()
+        elapsed_ref_negative = end-start
 
-        print("[LAAB] Jax | cm_partial_op_sum | optimized={:.8f} s | actual={:.8f} s".format(elapsed_optimized,elapsed_actual))
+        print("[LAAB] Jax | cm_partial_op_sum | ref_positive={:.8f} s | operator={:.8f} s | ref_negative={:.5f} s".format(elapsed_ref_positive,
+                                                                                                                          elapsed_operator,
+                                                                                                                          elapsed_ref_negative))

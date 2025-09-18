@@ -10,7 +10,7 @@ def operator(A,B):
 @tf.function
 def ref_positive(A,B):
     tmp = tf.transpose(A)@B
-    ret = tmp + tmp
+    ret = 2*tmp
     return ret
 
 if __name__ == "__main__":

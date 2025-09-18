@@ -4,12 +4,18 @@ import os
 import time
 
 @jax.jit
-def optimized(H,x):
+def ref_positive(H,x):
     ret = jnp.transpose(H)@(H@x) 
     return ret
 
 @jax.jit
-def actual(H,x):
+def ref_negative(H,x):
+    tmp = jnp.transpose(H)@H
+    ret = tmp@x
+    return ret
+
+@jax.jit
+def operator(H,x):
     ret = jnp.transpose(H)@H@x 
     return ret
 
@@ -39,10 +45,10 @@ if __name__ == "__main__":
         _ = bytearray(300*1024*1024); _[:] = b'0'
         
         start = time.perf_counter()
-        ret = actual(H,x).block_until_ready()
+        ret = operator(H,x).block_until_ready()
         end = time.perf_counter()
         
-        elapsed_actual = end-start
+        elapsed_operator = end-start
         
         start = time.perf_counter()
         ret = linalg_multidot(H,x).block_until_ready()
@@ -51,9 +57,18 @@ if __name__ == "__main__":
         elapsed_multidot = end-start
         
         start = time.perf_counter()
-        ret = optimized(H,x).block_until_ready()
+        ret = ref_positive(H,x).block_until_ready()
         end = time.perf_counter()
         
-        elapsed_optimized = end-start
+        elapsed_ref_positive = end-start
         
-        print("[LAAB] Jax | matchain_rtol | optimized={:.5f} s | actual={:.5f} s | linalg_multidot={:.5f} s".format(elapsed_optimized,elapsed_actual,elapsed_multidot))
+        start = time.perf_counter()
+        ret = ref_negative(H,x).block_until_ready()
+        end = time.perf_counter()
+        
+        elapsed_ref_negative = end-start
+        
+        print("[LAAB] Jax | matchain_rtol | ref_positive={:.5f} s | operator={:.5f} s | linalg_multidot={:.5f} s | ref_negative={:.5f} s".format(elapsed_ref_positive,
+                                                                                                                                                 elapsed_operator,
+                                                                                                                                                 elapsed_multidot,
+                                                                                                                                                 elapsed_ref_negative))

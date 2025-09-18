@@ -5,7 +5,7 @@ import time
 
 
 @jax.jit
-def actual(A):
+def operator(A):
     ret = A@jnp.transpose(A)
     return ret
 
@@ -37,9 +37,9 @@ if __name__ == "__main__":
         _ = bytearray(300*1024*1024); _[:] = b'0'
         
         start = time.perf_counter()
-        ret = actual(A).block_until_ready()
+        ret = operator(A).block_until_ready()
         end = time.perf_counter()
-        elapsed_actual = end-start
+        elapsed_operator = end-start
         
         start = time.perf_counter()
         ret = jnp_matmul(A).block_until_ready()
@@ -47,6 +47,6 @@ if __name__ == "__main__":
         elapsed_matmul = end-start
         
         
-        print("[LAAB] Jax | mp_syrk | actual={:.5f} s | jnp_matmul={:.5f} s".format(elapsed_actual, elapsed_matmul))  
+        print("[LAAB] Jax | mp_syrk | operator={:.5f} s | jnp_matmul={:.5f} s".format(elapsed_operator, elapsed_matmul))  
     
 

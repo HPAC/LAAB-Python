@@ -17,7 +17,6 @@ def ref_positive(A1,A2,B1,B2):
     ret = tf.concat((A1@B1, A2@B2),0)
     return ret
 
-@tf.function
 def ref_negative(A,B):
     # no graph mode
     ret = A@B

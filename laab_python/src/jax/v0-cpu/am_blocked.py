@@ -4,7 +4,7 @@ import os
 import time
 
 @jax.jit
-def actual(A,B):
+def operator(A,B):
     ret = A@B
     return ret
 
@@ -14,8 +14,13 @@ def jnp_matmul(A,B):
     return ret
 
 @jax.jit
-def optimized(A1,A2,B1,B2):
+def ref_positive(A1,A2,B1,B2):
     ret = jnp.concatenate((A1@B1, A2@B2),axis=0)
+    return ret
+
+def ref_negative(A,B):
+    # no graph mode
+    ret = A@B
     return ret
 
 if __name__ == "__main__":
@@ -42,9 +47,9 @@ if __name__ == "__main__":
         _ = bytearray(300*1024*1024); _[:] = b'0'
         
         start = time.perf_counter()
-        ret1 = actual(A,B).block_until_ready()
+        ret1 = operator(A,B).block_until_ready()
         end = time.perf_counter()
-        elapsed_actual = end-start
+        elapsed_operator = end-start
         
         start = time.perf_counter()
         ret = jnp_matmul(A,B).block_until_ready()
@@ -52,8 +57,16 @@ if __name__ == "__main__":
         elapsed_matmul = end-start
         
         start = time.perf_counter()
-        ret1 = optimized(A1,A2,B1,B2).block_until_ready()
+        ret1 = ref_positive(A1,A2,B1,B2).block_until_ready()
         end = time.perf_counter()
-        elapsed_optimized = end-start    
+        elapsed_ref_positive = end-start
+        
+        start = time.perf_counter()
+        ret1 = ref_negative(A,B).block_until_ready()
+        end = time.perf_counter()
+        elapsed_ref_negative = end-start    
 
-        print("[LAAB] Jax | am_blocked | optimized={:.5f} s | actual={:.5f} s  | jnp_matmul={:.5f} s".format(elapsed_optimized, elapsed_actual, elapsed_matmul))
+        print("[LAAB] Jax | am_blocked | ref_positive={:.5f} s | operator={:.5f} s  | jnp_matmul={:.5f} s | ref_negative={:.5f} s".format(elapsed_ref_positive,
+                                                                                                                                        elapsed_operator,
+                                                                                                                                        elapsed_matmul,
+                                                                                                                                        elapsed_ref_negative))

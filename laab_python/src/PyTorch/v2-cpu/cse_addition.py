@@ -10,7 +10,7 @@ def operator(A,B):
 @torch.jit.script
 def ref_positive(A,B):
     tmp = torch.t(A)@B
-    ret = tmp + tmp
+    ret = 2*tmp
     return ret
 
 if __name__ == "__main__":
