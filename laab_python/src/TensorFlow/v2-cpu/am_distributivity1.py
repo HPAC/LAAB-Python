@@ -4,13 +4,20 @@ import time
 
 
 @tf.function
-def actual(A,B,C):
+def operator(A,B,C):
     ret = A@B + A@C
     return ret
 
 @tf.function
-def optimized(A,B,C):
+def ref_positive(A,B,C):
     ret = A@(B+C)
+    return ret
+
+@tf.function
+def ref_negative(A,B,C):
+    tmp1 = A@B
+    tmp2 = A@C
+    ret = tmp1 + tmp2
     return ret
 
 if __name__ == "__main__":
@@ -34,14 +41,21 @@ if __name__ == "__main__":
         _ = bytearray(300*1024*1024); _[:] = b'0'
         
         start = time.perf_counter()
-        ret1 = actual(A,B,C)
+        ret1 = operator(A,B,C)
         end = time.perf_counter()
-        elapsed_actual = end-start
+        elapsed_operator = end-start
 
         start = time.perf_counter()
-        ret1 = optimized(A,B,C)
+        ret1 = ref_positive(A,B,C)
         end = time.perf_counter()
-        elapsed_optimized = end-start    
+        elapsed_ref_positive = end-start
         
-        print("[LAAB] TensorFlow | am_distributivity1 | optimized={:.5f} s | actual={:.5f} s".format(elapsed_optimized,elapsed_actual))
+        start = time.perf_counter()
+        ret1 = ref_negative(A,B,C)
+        end = time.perf_counter()
+        elapsed_ref_negative = end-start    
+        
+        print("[LAAB] TensorFlow | am_distributivity1 | ref_positive={:.5f} s | operator={:.5f} s | ref_negative={:.5f} s".format(elapsed_ref_positive,
+                                                                                                                                  elapsed_operator,
+                                                                                                                                  elapsed_ref_negative))
 

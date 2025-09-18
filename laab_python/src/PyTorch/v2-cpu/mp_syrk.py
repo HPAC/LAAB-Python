@@ -4,7 +4,7 @@ import time
 
 
 @torch.jit.script
-def actual(A):
+def operator(A):
     ret = A@torch.t(A)
     return ret
 
@@ -34,15 +34,15 @@ if __name__ == "__main__":
         _ = bytearray(300*1024*1024); _[:] = b'0'
         
         start = time.perf_counter()
-        ret = actual(A)
+        ret = operator(A)
         end = time.perf_counter()
-        elapsed_actual = end-start
+        elapsed_operator = end-start
         
         start = time.perf_counter()
         ret = linalg_matmul(A)
         end = time.perf_counter()
         elapsed_matmul = end-start
         
-        print("[LAAB] PyTorch | mp_syrk | actual={:.5f} s | linalg_matmul={:.5f} s".format(elapsed_actual, elapsed_matmul))  
+        print("[LAAB] PyTorch | mp_syrk | operator={:.5f} s | linalg_matmul={:.5f} s | ref_negative=R+sgemm".format(elapsed_operator, elapsed_matmul))  
     
 

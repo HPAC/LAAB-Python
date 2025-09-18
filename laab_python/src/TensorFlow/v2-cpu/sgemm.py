@@ -4,7 +4,7 @@ import time
 
 
 @tf.function
-def actual(A,B):
+def operator(A,B):
     ret = A@B
     return ret
 
@@ -34,13 +34,13 @@ if __name__ == "__main__":
         _ = bytearray(300*1024*1024); _[:] = b'0'
         
         start = time.perf_counter()
-        ret = actual(A,B)
+        ret = operator(A,B)
         end = time.perf_counter()
-        elapsed_actual = end-start 
+        elapsed_operator = end-start 
         
         start = time.perf_counter()
         ret = linalg_matmul(A,B)
         end = time.perf_counter()
         elapsed_matmul = end-start
         
-        print("[LAAB] TensorFlow | sgemm | actual={:.5f} s | linalg_matmul={:.5f} s".format(elapsed_actual, elapsed_matmul)) 
+        print("[LAAB] TensorFlow | sgemm | operator={:.5f} s | linalg_matmul={:.5f} s".format(elapsed_operator, elapsed_matmul)) 

@@ -12,6 +12,7 @@ class LAABResults:
         
         self._prepare(data_file)
         
+        self.slow_down = {}
         self.loss = {}
         self.mean_loss = 0.0
         
@@ -22,6 +23,7 @@ class LAABResults:
         with open(data_file, "r") as f:
             for line in f:
                 self._add_entry(line)
+                    
     
     def _add_entry(self, line):
    
@@ -35,51 +37,70 @@ class LAABResults:
     
         exp = record[0].strip()
         if not exp in self.data:
-            self.data[exp] = {'optimized': [],  'tests':{}}
+            self.data[exp] = {'ref_positive': [],  'tests':{}, 'ref_negative': []}
         
         for i in range(1, len(record)):
             test = record[i].strip().split("=")[0].strip()
-            value = float(record[i].split('=')[1].split(' ')[0].strip())
+            value = record[i].split('=')[1].split(' ')[0].strip()
             
-            if test == "optimized":
-                value = max(value, self.delta)
-                self.data[exp]['optimized'].append(value)
+            if test == "ref_positive":
+                value = max(float(value), self.delta)
+                self.data[exp]['ref_positive'].append(value)
+            elif test == "ref_negative":
+                if not value.startswith("R"):
+                    value = float(value)
+                    self.data[exp]['ref_negative'].append(value)
+                else:
+                    if len(self.data[exp]['ref_negative']) > 0:
+                        continue
+                    if value[1] == '+':
+                        self.data[exp]['ref_negative'] = self.data[value[2:]]['ref_positive']
+                    elif value[1] == '-':
+                        self.data[exp]['ref_negative'] = self.data[value[2:]]['ref_negative']
             else:
                 if not test in self.data[exp]['tests']:
                     self.data[exp]['tests'][test] = []
-                self.data[exp]['tests'][test].append(value)
+                self.data[exp]['tests'][test].append(float(value))
                 
     def compute_loss(self, q_min=25, q_max=75):
         if not self.data:
             raise ValueError("No data to compute results")
         _loss_vals = []
         for exp, data in self.data.items():
+            self.slow_down[exp] = {}
+            self.slow_down[exp]['ref_negative'] = self._slow_down(data['ref_negative'], data['ref_positive'], q_min=q_min, q_max=q_max)
             self.loss[exp] = {}
             for test, values in data['tests'].items():
-                loss = self._loss_fn(values, data['optimized'],q_min=q_min, q_max=q_max)
-                self.loss[exp][test] = loss
+                self.slow_down[exp][test] = self._slow_down(values, data['ref_positive'], q_min=q_min, q_max=q_max)
+                
+                self.loss[exp][test] = 0.0
+                if self.slow_down[exp]['ref_negative'] > 0.0:
+                    self.loss[exp][test] = self.slow_down[exp][test]/self.slow_down[exp]['ref_negative']
+            
             _loss_vals.append(np.min(list(self.loss[exp].values())))
+            
         self.mean_loss = np.mean(_loss_vals)
                 
             
     
-    def _loss_fn(self, vals, ref_vals, q_min=25, q_max=75):
+    def _slow_down(self, vals, ref_vals, q_min=25, q_max=75):
         vals_q = np.percentile(vals, [q_min, q_max])
         # ref_vals = [max(x, delta) for x in ref_vals]
         ref_vals_q = np.percentile(ref_vals, [q_min, q_max])
         
-        loss = 0.0
+        slow_down = 0.0
         if vals_q[0] > ref_vals_q[1]:
             # loss is diff in median
-            loss = (np.median(vals) - np.median(ref_vals)) / np.median(ref_vals)
+            slow_down = (np.min(vals) - np.min(ref_vals)) / np.min(ref_vals)
         
-        return loss
+        return slow_down
     
     def get_min_test_times(self):
         min_time = {}
         for exp, data in self.data.items():
-            min_time[exp] = {'optimized': 0,  'tests':{}}
-            min_time[exp]['optimized'] = np.min(data['optimized'])
+            min_time[exp] = {'ref_positive': 0,  'tests':{}, 'ref_negative':0}
+            min_time[exp]['ref_positive'] = np.min(data['ref_positive'])
+            min_time[exp]['ref_negative'] = np.min(data['ref_negative'])
             for test, values in data['tests'].items():
                 min_time[exp]['tests'][test] = np.min(values)
         return min_time

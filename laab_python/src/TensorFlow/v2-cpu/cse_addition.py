@@ -3,12 +3,12 @@ import os
 import time
 
 @tf.function
-def actual(A,B):
+def operator(A,B):
     ret = tf.transpose(A)@B + tf.transpose(A)@B
     return ret
 
 @tf.function
-def optimized(A,B):
+def ref_positive(A,B):
     tmp = tf.transpose(A)@B
     ret = tmp + tmp
     return ret
@@ -34,14 +34,17 @@ if __name__ == "__main__":
         _ = bytearray(300*1024*1024); _[:] = b'0'
         
         start = time.perf_counter()
-        ret1 = actual(A,B)
+        ret1 = operator(A,B)
         end = time.perf_counter()
-        elapsed_actual = end-start
+        elapsed_operator = end-start
 
         start = time.perf_counter()
-        ret1 = optimized(A,B)
+        ret1 = ref_positive(A,B)
         end = time.perf_counter()
-        elapsed_optimized = end-start
+        elapsed_ref_positive = end-start
+        elapsed_ref_negative = 2*elapsed_ref_positive
 
 
-        print("[LAAB] TensorFlow | cse_addition | optimized={:.5f} s | actual={:.5f} s".format(elapsed_optimized,elapsed_actual))  
+        print("[LAAB] TensorFlow | cse_addition | ref_positive={:.5f} s | operator={:.5f} s | ref_negative={:.5f} s".format(elapsed_ref_positive,
+                                                                                                                            elapsed_operator,
+                                                                                                                            elapsed_ref_negative))  

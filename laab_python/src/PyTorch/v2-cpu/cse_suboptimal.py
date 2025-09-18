@@ -3,13 +3,20 @@ import os
 import time
 
 @torch.jit.script
-def actual(A,B,y):
+def operator(A,B,y):
     ret = torch.t(A)@B@torch.t(A)@B@y    
     return ret
 
 @torch.jit.script
-def optimized(A,B,y):
+def ref_positive(A,B,y):
     ret = torch.t(A)@(B@(torch.t(A)@(B@y)))
+    return ret
+
+@torch.jit.script
+def ref_negative(A,B,y):
+    tmp1 = torch.t(A)@B
+    tmp2  = tmp1@tmp1
+    ret = tmp2@y
     return ret
 
 if __name__ == "__main__":
@@ -33,14 +40,21 @@ if __name__ == "__main__":
         _ = bytearray(300*1024*1024); _[:] = b'0'
         
         start = time.perf_counter()
-        ret = actual(A,B,y)
+        ret = operator(A,B,y)
         end = time.perf_counter()
-        elapsed_actual = end-start
+        elapsed_operator = end-start
 
         start = time.perf_counter()
-        ret = optimized(A,B,y)
+        ret = ref_positive(A,B,y)
         end = time.perf_counter()
-        elapsed_optimized = end-start
+        elapsed_ref_positive = end-start
+        
+        start = time.perf_counter()
+        ret = ref_negative(A,B,y)
+        end = time.perf_counter()
+        elapsed_ref_negative = end-start
 
 
-        print("[LAAB] PyTorch | cse_suboptimal | optimized={:.5f} s | actual={:.5f} s".format(elapsed_optimized, elapsed_actual))  
+        print("[LAAB] PyTorch | cse_suboptimal | ref_positive={:.5f} s | operator={:.5f} s | ref_negative={:.5f} s".format(elapsed_ref_positive,
+                                                                                                                           elapsed_operator,
+                                                                                                                           elapsed_ref_negative))  

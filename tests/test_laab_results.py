@@ -3,6 +3,7 @@ from laab_python.laab_results import LAABResults
 def test1():
     
     data_file = "tests/sample_data/data_pyt.txt"
+    # data_file = "tests/sample_data/data_tf.txt"
     eb_version = "PyTorch/2.1.2-foss-2023a"
     system = "HPC2N_x86_64"
 
@@ -24,6 +25,10 @@ def test1():
         print(f"{exp}: {data}")
     
     laab_results.compute_loss()
+    
+    print("\nSLOW_DOWN")
+    for exp, slow_down in laab_results.slow_down.items():
+        print(f"{exp}: {slow_down}")
     
     print("\nLOSS")
     for exp, loss in laab_results.loss.items():

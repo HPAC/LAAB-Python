@@ -17,5 +17,5 @@ exp_config = {
     "omp_num_threads": 1
 }
 
-prepare_markdown_report(laab_results, 'config.json', exp_config, template_file, "README.md", cutoff=0.10)
+prepare_markdown_report(laab_results, 'config.json', exp_config, template_file, "README.md", cutoff=0.05)
     

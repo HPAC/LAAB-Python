@@ -4,6 +4,7 @@
 # LAAB_PREFIX = taskset -c 0
 # LAAB_REPS = 3
 # LAAB_N = 3000
+# OMP_NUM_THREADS = 4
 
 
 SCRIPTS = \

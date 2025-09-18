@@ -3,12 +3,12 @@ import os
 import time
 
 @torch.jit.script
-def actual(A,B):
+def operator(A,B):
     ret = torch.t(torch.t(A)@B)@torch.t(A)@B    
     return ret
 
 @torch.jit.script
-def optimized(A,B):
+def ref_positive(A,B):
     tmp = torch.t(A)@B
     ret = torch.t(tmp)@tmp
     return ret
@@ -33,14 +33,17 @@ if __name__ == "__main__":
         _ = bytearray(300*1024*1024); _[:] = b'0'
         
         start = time.perf_counter()
-        ret = actual(A,B)
+        ret = operator(A,B)
         end = time.perf_counter()
-        elapsed_actual = end-start
+        elapsed_operator = end-start
 
         start = time.perf_counter()
-        ret = optimized(A,B)
+        ret = ref_positive(A,B)
         end = time.perf_counter()
-        elapsed_optimized = end-start
+        elapsed_ref_positive = end-start
+        elapsed_ref_negative = (3/2)*elapsed_ref_positive
 
 
-        print("[LAAB] PyTorch | cse_matmul_no_paranthesis | optimized={:.5f} s | actual={:.5f} s".format(elapsed_optimized, elapsed_actual))  
+        print("[LAAB] PyTorch | cse_matmul_no_paranthesis | ref_positive={:.5f} s | operator={:.5f} s | ref_negative={:.5f} s".format(elapsed_ref_positive, 
+                                                                                                                                      elapsed_operator,
+                                                                                                                                      elapsed_ref_negative))  

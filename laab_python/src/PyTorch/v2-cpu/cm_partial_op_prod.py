@@ -3,15 +3,20 @@ import os
 import time
 
 @torch.jit.script
-def actual(A,B):
+def operator(A,B):
     ret = (A@B)[2,2]
     #tmp = A@B
     #ret = tmp[2,2]
     return ret
 
 @torch.jit.script
-def optimized(A,B):
+def ref_positive(A,B):
     ret = torch.dot(A[2],B[:,2])
+    return ret
+
+@torch.jit.script
+def ref_negative(A,B):
+    ret = A@B
     return ret
 
 if __name__ == "__main__":
@@ -33,13 +38,20 @@ if __name__ == "__main__":
         _ = bytearray(300*1024*1024); _[:] = b'0'
         
         start = time.perf_counter()
-        ret1 = actual(A,B)
+        ret1 = operator(A,B)
         end = time.perf_counter()
-        elapsed_actual = end-start
+        elapsed_operator = end-start
         
         start = time.perf_counter()
-        ret1 = optimized(A,B)
+        ret1 = ref_positive(A,B)
         end = time.perf_counter()
-        elapsed_optimized = end-start
+        elapsed_ref_positive = end-start
+        
+        start = time.perf_counter()
+        ret1 = ref_negative(A,B)
+        end = time.perf_counter()
+        elapsed_ref_negative = end-start
 
-        print("[LAAB] PyTorch | cm_partial_op_prod | optimized={:.5f} s | actual={:.5f} s".format(elapsed_optimized,elapsed_actual))
+        print("[LAAB] PyTorch | cm_partial_op_prod | ref_positive={:.5f} s | operator={:.5f} s | ref_negative={:.5f} s".format(elapsed_ref_positive,
+                                                                                                                               elapsed_operator,
+                                                                                                                               elapsed_ref_negative))

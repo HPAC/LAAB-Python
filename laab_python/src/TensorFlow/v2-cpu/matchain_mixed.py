@@ -3,12 +3,20 @@ import os
 import time
 
 @tf.function
-def optimized(H,x,y):
+def ref_positive(H,x,y):
     ret = (tf.transpose(H)@y)@(tf.transpose(x)@H) 
     return ret
 
 @tf.function
-def actual(H,x,y):
+def ref_negative(H,x,y):
+    # evaluates from right-to-left
+    tmp1 = tf.transpose(H)@y
+    tmp2 = tmp1@tf.transpose(x)
+    ret = tmp2@H
+    return ret
+
+@tf.function
+def operator(H,x,y):
     ret = tf.transpose(H)@y@tf.transpose(x)@H 
     return ret
 
@@ -37,15 +45,23 @@ if __name__ == "__main__":
         _ = bytearray(300*1024*1024); _[:] = b'0'
         
         start = time.perf_counter()
-        ret = actual(H,x,y)
+        ret = operator(H,x,y)
         end = time.perf_counter()
         
-        elapsed_actual = end-start
+        elapsed_operator = end-start
         
         start = time.perf_counter()
-        ret = optimized(H,x,y)
+        ret = ref_positive(H,x,y)
         end = time.perf_counter()
         
-        elapsed_optimized = end-start
+        elapsed_ref_positive = end-start
         
-        print("[LAAB] TensorFlow | matchain_mixed | optimized={:.5f} s | actual={:.5f} s".format(elapsed_optimized,elapsed_actual))  
+        start = time.perf_counter()
+        ret = ref_negative(H,x,y)
+        end = time.perf_counter()
+        
+        elapsed_ref_negative = end-start
+        
+        print("[LAAB] TensorFlow | matchain_mixed | ref_positive={:.5f} s | operator={:.5f} s | ref_negative={:.5f} s".format(elapsed_ref_positive,
+                                                                                                                              elapsed_operator,
+                                                                                                                              elapsed_ref_negative))  

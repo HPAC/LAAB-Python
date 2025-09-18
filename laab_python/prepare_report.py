@@ -34,7 +34,6 @@ def prepare_markdown_report(laab_results, src_config_file, exp_config, template_
         raise FileNotFoundError(f"Config file {src_config_file} not found")
     config = json.load(open(src_config_file, "r"))
 
-    
     if set(laab_results.data.keys()) != set(config.keys()):
         raise ValueError("Experiments in data file and config file do not match")
     
@@ -60,6 +59,7 @@ def prepare_markdown_report(laab_results, src_config_file, exp_config, template_
         "system": laab_results.system,
         "cpu_model": laab_results.cpu_model,
         "losses": format_floats_recursive(losses,prec),
+        "slow_down": format_floats_recursive(laab_results.slow_down,prec),
         "mean_loss": f"{mean_loss:.{prec}f}",
         "cutoff_results": format_cutoff_results_md(cutoff_results),
         "score": score,

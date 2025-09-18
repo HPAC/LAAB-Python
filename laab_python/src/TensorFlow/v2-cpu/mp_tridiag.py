@@ -3,7 +3,7 @@ import os
 import time
 
 @tf.function
-def actual(A,B):
+def operator(A,B):
     ret = A@B
     return ret
 
@@ -39,9 +39,9 @@ if __name__ == "__main__":
         _ = bytearray(300*1024*1024); _[:] = b'0'
         
         start = time.perf_counter()
-        ret = actual(A,B)
+        ret = operator(A,B)
         end = time.perf_counter()
-        elapsed_actual = end-start
+        elapsed_operator = end-start
         
         start = time.perf_counter()
         ret = linalg_matmul(A,B)
@@ -53,6 +53,6 @@ if __name__ == "__main__":
         end = time.perf_counter()
         elaposed_tridiagonal = end-start
         
-        print("[LAAB] TensorFlow | mp_tridiag | actual={:.5f} s | linalg_matmul={:.5f} s | linalg_tridiagonal_matmul={:.5f} s".format(elapsed_actual, elapsed_matmul, elaposed_tridiagonal))  
+        print("[LAAB] TensorFlow | mp_tridiag | operator={:.5f} s | linalg_matmul={:.5f} s | linalg_tridiagonal_matmul={:.5f} s | ref_negative=R+sgemm".format(elapsed_operator, elapsed_matmul, elaposed_tridiagonal))  
     
 

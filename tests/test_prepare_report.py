@@ -36,7 +36,7 @@ def test_tf():
     }
     
     laab_results = LAABResults(data_file, eb_version, system)
-    prepare_markdown_report(laab_results, src_config_file, exp_config, template_file, outfile, cutoff=0.1)
+    prepare_markdown_report(laab_results, src_config_file, exp_config, template_file, outfile, cutoff=0.05)
 
 def test_jax():
     template_file = "laab_python/templates/report_template.md"
@@ -54,9 +54,9 @@ def test_jax():
     }
     
     laab_results = LAABResults(data_file, eb_version, system)
-    prepare_markdown_report(laab_results, src_config_file, exp_config, template_file, outfile, cutoff=0.1)
+    prepare_markdown_report(laab_results, src_config_file, exp_config, template_file, outfile, cutoff=0.05)
             
 if __name__ == "__main__":
     test_pyt()
     test_tf()
-    test_jax()
+    # test_jax()
