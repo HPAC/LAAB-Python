@@ -48,6 +48,13 @@ if __name__ == "__main__":
         ret = ref_positive(A,B,y).block_until_ready()
         end = time.perf_counter()
         elapsed_ref_positive = end-start
+        
+        start = time.perf_counter()
+        ret = ref_negative(A,B,y).block_until_ready()
+        end = time.perf_counter()
+        elapsed_ref_negative = end-start
 
 
-        print("[LAAB] Jax | cse_suboptimal | ref_positive={:.5f} s | operator={:.5f} s".format(elapsed_ref_positive, elapsed_operator))  
+        print("[LAAB] Jax | cse_suboptimal | ref_positive={:.5f} s | operator={:.5f} s | ref_negative={:.5f} s".format(elapsed_ref_positive, 
+                                                                                                                       elapsed_operator,
+                                                                                                                       elapsed_ref_negative))  

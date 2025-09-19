@@ -44,6 +44,6 @@ if __name__ == "__main__":
         elapsed_matmul = end-start
         
         
-        print("[LAAB] Jax | mp_trmm | operator={:.5f} s | jnp_matmul={:.5f} s".format(elapsed_operator, elapsed_matmul))  
+        print("[LAAB] Jax | mp_trmm | operator={:.5f} s | jnp_matmul={:.5f} s | ref_negative=R+sgemm".format(elapsed_operator, elapsed_matmul))  
     
 

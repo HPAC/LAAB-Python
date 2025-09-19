@@ -1,74 +1,74 @@
 {
     "sgemm":{
         "tests":{
-            "operator": "t(A)@B",
-            "linalg_matmul": "linalg.matmul(t(A),B)"
+            "operator": "transpose(A)@B",
+            "linalg_matmul": "jax.numpy.matmul(t(A),B)"
         },
         "ref_positive": "sgemm"
     },
     "cse_addition":{
         "tests":{
-            "operator": "t(A)@B + t(A)@B"
+            "operator": "transpose(A)@B + transpose(A)@B"
         },
-        "ref_positive": "2*(t(A)@B)"
+        "ref_positive": "2*(transpose(A)@B)"
     },
     "cse_matmul_paranthesis":{
         "tests":{
-            "operator": "t(t(A)@B)@(t(A)@B)"
+            "operator": "transpose(transpose(A)@B)@(transpose(A)@B)"
         },
-        "ref_positive": "S=t(A)@B; t(S)@S"
+        "ref_positive": "S=transpose(A)@B; transpose(S)@S"
     },
     "cse_matmul_no_paranthesis":{
         "tests":{
-            "operator": "t(t(A)@B)@t(A)@B"
+            "operator": "transpose(transpose(A)@B)@transpose(A)@B"
         },
-        "ref_positive": "S=t(A)@B; t(S)@S"
+        "ref_positive": "S=transpose(A)@B; transpose(S)@S"
     },
     "cse_suboptimal":{
         "tests":{
-            "operator": "t(A)@B@t(A)@B@y"
+            "operator": "transpose(A)@B@transpose(A)@B@y"
         },
-        "ref_positive": "t(A)@(B@(t(A)@(B@y))"
+        "ref_positive": "transpose(A)@(B@(transpose(A)@(B@y))"
     },
     "matchain_rtol":{
         "tests":{
-            "operator": "t(H)@H@x",
-            "linalg_multidot": "linalg.multi_dot([t(H), H, x])"
+            "operator": "transpose(H)@H@x",
+            "linalg_multidot": "linalg.multi_dot([transpose(H), H, x])"
         },
-        "ref_positive": "t(H)@(H@x)"
+        "ref_positive": "transpose(H)@(H@x)"
     },
     "matchain_ltor":{
         "tests": {
-            "operator": "t(y)@t(H)@H",
-            "linalg_multidot": "linalg.multi_dot([t(y), t(H), H])"
+            "operator": "transpose(y)@transpose(H)@H",
+            "linalg_multidot": "linalg.multi_dot([transpose(y), transpose(H), H])"
         },
-        "ref_positive": "(t(y)@t(H))@H"
+        "ref_positive": "(transpose(y)@transpose(H))@H"
     },
     "matchain_mixed":{
         "tests": {
-            "operator": "t(H)@y@t(x)@H",
-            "linalg_multidot": "linalg.multi_dot([t(H), y, t(x), H])"
+            "operator": "transpose(H)@y@transpose(x)@H",
+            "linalg_multidot": "linalg.multi_dot([transpose(H), y, transpose(x), H])"
         },
-        "ref_positive": "(t(H)@y)@(t(x)@H)"
+        "ref_positive": "(transpose(H)@y)@(transpose(x)@H)"
     },
     "mp_trmm":{
         "tests": {
             "operator": "A@B",
-            "linalg_matmul": "linalg.matmul(A,B)"
+            "linalg_matmul": "jax.numpy.matmul(A,B)"
         },
         "ref_positive": "trmm"
     },
     "mp_syrk":{
         "tests": {
             "operator": "A@B",
-            "linalg_matmul": "linalg.matmul(A,B)"
+            "linalg_matmul": "jax.numpy.matmul(A,B)"
         },
         "ref_positive": "syrk"
     },
     "mp_tridiag":{
         "tests": {
             "operator": "A@B",
-            "linalg_matmul": "linalg.matmul(A,B)"
+            "linalg_matmul": "jax.numpy.matmul(A,B)"
         },
         "ref_positive": "csr(A)@B"
     },
@@ -80,14 +80,14 @@
     },
     "am_distributivity2":{
         "tests": {
-            "operator": "(A - t(H)@H)@x"
+            "operator": "(A - transpose(H)@H)@x"
         },
-        "ref_positive": "A@x - t(H)@(H@x)"
+        "ref_positive": "A@x - transpose(H)@(H@x)"
     },
     "am_blocked":{
         "tests": {
             "operator": "A@B",
-            "linalg_matmul": "linalg.matmul(A,B)"
+            "linalg_matmul": "jax.numpy.matmul(A,B)"
         },
         "ref_positive": "blocked matrix multiply"
     },

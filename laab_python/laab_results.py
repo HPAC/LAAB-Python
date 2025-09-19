@@ -23,6 +23,16 @@ class LAABResults:
         with open(data_file, "r") as f:
             for line in f:
                 self._add_entry(line)
+                
+        ## sanity check
+        for exp, data in self.data.items():
+            if len(data['ref_positive']) == 0:
+                raise ValueError(f"No ref_positive data for experiment {exp}")
+            if len(data['ref_negative']) == 0:
+                raise ValueError(f"No ref_negative data for experiment {exp}")
+            for test, values in data['tests'].items():
+                if len(values) == 0:
+                    raise ValueError(f"No data for test {test} in experiment {exp}")
                     
     
     def _add_entry(self, line):

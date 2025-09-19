@@ -35,6 +35,8 @@ def prepare_markdown_report(laab_results, src_config_file, exp_config, template_
     config = json.load(open(src_config_file, "r"))
 
     if set(laab_results.data.keys()) != set(config.keys()):
+        missing = set(config.keys()) - set(laab_results.data.keys())
+        print("Missing experiments in data file:", missing)
         raise ValueError("Experiments in data file and config file do not match")
     
     
