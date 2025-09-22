@@ -20,9 +20,9 @@ Description: The time taken for general matrix multiplication $A^TB$ is compared
 
 ||Call  |  time (s)  | slowdown | loss | result@0.05 | 
 |----|------|------------|--|---|--|
-|$A^TB$|`transpose(A)@B`| 0.509 | 0.029 | 0.008| :white_check_mark: |
-|$"$|`jax.numpy.matmul(t(A),B)` |  |   |  |  |
-|**Ref (-)** |`sgemv for each row`| **2.222**| **3.499** | | |
+|$A^TB$|`transpose(A)@B`| 0.508 | 0.027 | 0.008| :white_check_mark: |
+|$"$|`jax.numpy.matmul(t(A),B)` | 0.507 |  0.027 | 0.008 | :white_check_mark: |
+|**Ref (-)** |`sgemv for each row`| **2.234**| **3.522** | | |
 |**Ref (+)** |`sgemm`| **0.494**| - | | |
 
 
@@ -37,9 +37,9 @@ Description: The input expression is $E_1 = A^TB + A^TB$. The subexpression $A^T
 
 |Expr |Call |time (s) | slowdown |loss | result@0.05 |
 |-----|-----|----------|--|--|--|
-|$E_1$ |`transpose(A)@B + transpose(A)@B` | 1.017 | 0.992 | 0.992| :x: |
-|**Ref (-)** |`no cse`| **1.021**| **1.0** | | | 
-|**Ref (+)**| `2*(transpose(A)@B)`| **0.51**| - | | |
+|$E_1$ |`transpose(A)@B + transpose(A)@B` | 1.018 | 0.992 | 0.992| :x: |
+|**Ref (-)** |`no cse`| **1.022**| **1.0** | | | 
+|**Ref (+)**| `2*(transpose(A)@B)`| **0.511**| - | | |
 
 
 
@@ -51,9 +51,9 @@ Description: The input expression is $E_2 = (A^TB)^T(A^TB)$. The reference imple
 
 |Expr|Call | time (s) | slowdown | loss | result@0.05 |
 |-----|-----|----------|--|--|--|
-|$E_2$|`transpose(transpose(A)@B)@(transpose(A)@B)`| 1.52 | 0.501 | 1.002 | :x: |
-|**Ref (-)** |`no cse`| **1.519**| **0.5** | | |
-|**Ref (+)**| `S=transpose(A)@B; transpose(S)@S`| **1.013**| - | | |
+|$E_2$|`transpose(transpose(A)@B)@(transpose(A)@B)`| 1.523 | 0.501 | 1.002 | :x: |
+|**Ref (-)** |`no cse`| **1.522**| **0.5** | | |
+|**Ref (+)**| `S=transpose(A)@B; transpose(S)@S`| **1.015**| - | | |
 
 
 c) **Repeated in multiplication (no parenthesis)**
@@ -64,9 +64,9 @@ Description: The input expression is $E_3 = (A^TB)^TA^TB$. The reference impleme
 
 |Expr|Call | time (s) | slowdown | loss | result@0.05 |
 |-----|-----|----------|--|--|--|
-|$E_3$|`transpose(transpose(A)@B)@transpose(A)@B`| 1.509 | 0.487 | 0.974 | :x: |
-|**Ref (-)** |`no cse`| **1.522**| **0.5** | | |
-|**Ref (+)**| `S=transpose(A)@B; transpose(S)@S`| **1.015**| - | | |
+|$E_3$|`transpose(transpose(A)@B)@transpose(A)@B`| 1.512 | 0.487 | 0.974 | :x: |
+|**Ref (-)** |`no cse`| **1.525**| **0.5** | | |
+|**Ref (+)**| `S=transpose(A)@B; transpose(S)@S`| **1.017**| - | | |
 
 d) **Sub-optimal CSE**
 
@@ -76,9 +76,9 @@ Description: The input expression is $E_4 = A^TBA^TBy$. The reference implementa
 
 |Expr|Call | time (s) | slowdown | loss | result@0.05 |
 |-----|-----|----------|--|--|--|
-|$E_4$|`transpose(A)@B@transpose(A)@B@y`| 1.505 | 36.883 | 1.504 | :x: |
-|**Ref (-)** |`with cse`| **1.015**| **24.53** | | |
-|**Ref (+)**| `transpose(A)@(B@(transpose(A)@(B@y))`| **0.04**| - | | |
+|$E_4$|`transpose(A)@B@transpose(A)@B@y`| 1.514 | 38.282 | 1.51 | :x: |
+|**Ref (-)** |`with cse`| **1.015**| **25.346** | | |
+|**Ref (+)**| `transpose(A)@(B@(transpose(A)@(B@y))`| **0.039**| - | | |
 
 ## Test 3: Matrix chains
 
@@ -90,10 +90,10 @@ Description: The input matrix chain is $H^THx$. The reference implementation, ev
 
 |Expr|Call| time (s)| slowdown | loss | result@0.05 |
 |----|----|---------|--|--|--|
-|$H^THx$|`transpose(H)@H@x`| 0.505 | 29.021 | 1.0 | :x: | 
-|$"$|`linalg.multi_dot([transpose(H), H, x])`| 0.018 | 0.044 | 0.002 | :white_check_mark: |  
-|**Ref (-)** |`eval. left to right`| **0.505**| **29.023** | | |
-|**Ref (+)**| `transpose(H)@(H@x)`| **0.017**| - | | |
+|$H^THx$|`transpose(H)@H@x`| 0.507 | 25.19 | 1.0 | :x: | 
+|$"$|`linalg.multi_dot([transpose(H), H, x])`| 0.02 | 0.054 | 0.002 | :white_check_mark: |  
+|**Ref (-)** |`eval. left to right`| **0.507**| **25.187** | | |
+|**Ref (+)**| `transpose(H)@(H@x)`| **0.019**| - | | |
 
 b) **Left to right**:
 
@@ -103,9 +103,9 @@ Description: The input matrix chain is $y^TH^TH$. The reference implementation, 
 
 |Expr|Call | time (s)| slowdown | loss | result@0.05 |
 |----|-----|---------|--|--|--|
-|$y^TH^TH$|`transpose(y)@transpose(H)@H`| 0.011 | 0.031 | 0.001 | :white_check_mark: |  
-|$"$|`linalg.multi_dot([transpose(y), transpose(H), H])`| 0.011 | 0.003 | 0.0 | :white_check_mark: | 
-|**Ref (-)** |`eval. right to left`| **0.507**| **46.85** | | |
+|$y^TH^TH$|`transpose(y)@transpose(H)@H`| 0.011 | 0.045 | 0.001 | :white_check_mark: |  
+|$"$|`linalg.multi_dot([transpose(y), transpose(H), H])`| 0.011 | 0.001 | 0.0 | :white_check_mark: | 
+|**Ref (-)** |`eval. right to left`| **0.507**| **46.59** | | |
 |**Ref (+)**| `(transpose(y)@transpose(H))@H`| **0.011**| - | | |
 
 
@@ -117,10 +117,10 @@ Description: The input matrix chain is $H^Tyx^TH$. Here, neither left-to-right n
 
 |Expr|Call| time (s) | slowdown | loss | result@0.05 |
 |----|----|-----------|--|--|--|
-|$H^Tyx^TH$|`transpose(H)@y@transpose(x)@H`| 0.542 | 15.414 | 1.004 | :x: | 
-|$"$|`linalg.multi_dot([transpose(H), y, transpose(x), H])`| 0.034 | 0.036 | 0.002 | :white_check_mark: | 
-|**Ref (-)** |`eval. left to right`| **0.54**| **15.359** | | |
-|**Ref (+)**| `(transpose(H)@y)@(transpose(x)@H)`| **0.033**| - | | |
+|$H^Tyx^TH$|`transpose(H)@y@transpose(x)@H`| 0.543 | 14.166 | 1.0 | :x: | 
+|$"$|`linalg.multi_dot([transpose(H), y, transpose(x), H])`| 0.037 | 0.023 | 0.002 | :white_check_mark: | 
+|**Ref (-)** |`eval. left to right`| **0.543**| **14.172** | | |
+|**Ref (+)**| `(transpose(H)@y)@(transpose(x)@H)`| **0.036**| - | | |
 
 
 ## Test 4: Matrix properties
@@ -133,10 +133,10 @@ Description: The input expression is $AB$, where $A$ is lower triangular. The re
 
 |Expr|Call |  time (s)  | slowdown | loss | result@0.05|
 |----|-----|------------|--|--|--|
-|$AB$|`A@B`| 0.507 | 1.045 | 1.054 | :x: |
-|$"$|`jax.numpy.matmul(A,B)`|  |   |   |  |
-|**Ref (-)** |`sgemm`| **0.494**| **0.992** | | |
-|**Ref (+)** |`trmm`| **0.248**| - | | |
+|$AB$|`A@B`| 0.507 | 1.052 | 1.052 | :x: |
+|$"$|`jax.numpy.matmul(A,B)`| 0.508 |  1.055 | 1.055  | :x: |
+|**Ref (-)** |`sgemm`| **0.494**| **1.0** | | |
+|**Ref (+)** |`trmm`| **0.247**| - | | |
 
 b) **SYRK**
 
@@ -146,10 +146,10 @@ Description: The input expression is $AB$, where $A$ is transpose of  $B$. The r
 
 |Expr|Call |  time (s)  | slowdown | loss | result@0.05|
 |----|-----|------------|--|--|--|
-|$AB$|`A@B`| 0.506 | 0.984 | 1.05 | :x: |
-|$"$|`jax.numpy.matmul(A,B)`|  |  |   |  |
-|**Ref (-)** |`sgemm`| **0.494**| **0.937** | | |
-|**Ref (+)** |`syrk`| **0.255**| - | | |
+|$AB$|`A@B`| 0.506 | 1.008 | 1.05 | :x: |
+|$"$|`jax.numpy.matmul(A,B)`| 0.506 | 1.009 | 1.05  | :x: |
+|**Ref (-)** |`sgemm`| **0.494**| **0.96** | | |
+|**Ref (+)** |`syrk`| **0.252**| - | | |
 
 
 c) **Tri-diagonal**
@@ -160,9 +160,9 @@ Description: The input expression is $AB$, where $A$ is tri-diagonal. The refere
 
 |Expr|Call |  time (s)  | slowdown | loss | result@0.05|
 |----|-----|------------|--|--|--|
-|$AB$|`A@B`| 0.51 | 115.728 |1.032 | :x: |
-|$"$|`jax.numpy.matmul(A,B)`|  |  |   |  | 
-|**Ref (-)** |`sgemm`| **0.494**| **112.095** | | |
+|$AB$|`A@B`| 0.508 | 114.388 |1.028 | :x: |
+|$"$|`jax.numpy.matmul(A,B)`| 0.509 | 114.66 | 1.03  | :x: | 
+|**Ref (-)** |`sgemm`| **0.494**| **111.298** | | |
 |**Ref (+)** |`csr(A)@B`| **0.004**| - | | |
 
 
@@ -176,8 +176,8 @@ Description: The input expression is $E_1 = AB+AC$. This expression requires two
 
 |Expr|Call| time (s)| slowdown | loss | result@0.05 |
 |----|---|----------|--|--|--|
-|$E_1$|`A@B+ A@C`| 1.02 | 0.934 | 1.0 | :x: |
-|**Ref (-)** |`no rewrite`| **1.02**| **0.934** | | |
+|$E_1$|`A@B+ A@C`| 1.018 | 0.931 | 0.998 | :x: |
+|**Ref (-)** |`no rewrite`| **1.019**| **0.934** | | |
 |**Ref (+)**|`A@(B+C)`|**0.527**| - | | |
 
 b) **Distributivity 2**
@@ -188,9 +188,9 @@ Description: The input expression is $E_2 = (A - H^TH)x$, which involves one $\m
 
 |Expr|Call| time (s)| slowdown | loss | result@0.05 |
 |----|---|----------|--|--|--|
-|$E_2$|`(A - transpose(H)@H)@x`| 0.515 | 22.921 | 1.0 | :x: |
-|**Ref (-)** |`no rewrite`| **0.515**| **22.918** | | |
-|**Ref (+)**|`A@x - transpose(H)@(H@x)`|**0.022**| - | | |
+|$E_2$|`(A - transpose(H)@H)@x`| 0.516 | 23.413 | 1.0 | :x: |
+|**Ref (-)** |`no rewrite`| **0.516**| **23.411** | | |
+|**Ref (+)**|`A@x - transpose(H)@(H@x)`|**0.021**| - | | |
 
 c) **Blocked matrix**
 
@@ -200,9 +200,9 @@ Description: The input expression is $AB$, where $A$ consists of two blocks alon
 
 |Expr|Call| time (s)| slowdown | loss | result@0.05 |
 |----|---|----------|--|--|--|
-|$AB$|`A@B`| 0.507 | 0.801 | 0.999 | :x: |
-|$"$|`jax.numpy.matmul(A,B)` |  |  |  |  |
-|**Ref (-)** |`no rewrite`| **0.507**| **0.802** | | |
+|$AB$|`A@B`| 0.507 | 0.801 | 1.001 | :x: |
+|$"$|`jax.numpy.matmul(A,B)` | 0.507 | 0.802 | 1.002 | :x: |
+|**Ref (-)** |`no rewrite`| **0.507**| **0.8** | | |
 |**Ref (+)**|`blocked matrix multiply`|**0.281**| - | | |
 
 
@@ -228,8 +228,8 @@ Description: The input expression is $(A+B)[2,2]$, which requires only single el
 
 ||Call| time (s)| slowdown | loss | result@0.05 |
 |----|---|----------|--|--|--|
-||`(A+B)[2,2]`| 0.002 | 0.186 | 0.026 | :white_check_mark: |
-|**Ref (-)** |`no code motion`| **0.016**| **7.155** | | |
+||`(A+B)[2,2]`| 0.002 | 0.205 | 0.029 | :white_check_mark: |
+|**Ref (-)** |`no code motion`| **0.016**| **7.19** | | |
 |**Ref (+)**|`A[2,2] + B[2,2]`|**0.002**| - | | |
 
 c) **Partial operand access in product**
@@ -240,8 +240,8 @@ Description: The input expression is $(AB)[2,2]$, which requires only single ele
 
 ||Call| time (s)| slowdown | loss | result@0.05 |
 |----|---|----------|--|--|--|
-||`(A@B)[2,2]`| 0.509 | 253.655 | 1.011 | :x: |
-|**Ref (-)** |`no code motion`| **0.504**| **250.87** | | |
+||`(A@B)[2,2]`| 0.51 | 253.765 | 1.009 | :x: |
+|**Ref (-)** |`no code motion`| **0.505**| **251.525** | | |
 |**Ref (+)**|`dot(A[2,:],B[:,2])`|**0.002**| - | | |
 
 

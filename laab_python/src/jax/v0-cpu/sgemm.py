@@ -14,7 +14,7 @@ def operator(A,B):
     return ret
 
 @jax.jit
-def jnp_matmul(A,B):
+def linalg_matmul(A,B):
     ret = jnp.matmul(A,B)
     return ret
 
@@ -46,8 +46,8 @@ if __name__ == "__main__":
         elapsed_operator = end-start 
         
         start = time.perf_counter()
-        ret = jnp_matmul(A,B).block_until_ready()
+        ret = linalg_matmul(A,B).block_until_ready()
         end = time.perf_counter()
         elapsed_matmul = end-start
         
-        print("[LAAB] Jax | sgemm | operator={:.5f} s | jnp_matmul={:.5f} s".format(elapsed_operator, elapsed_matmul)) 
+        print("[LAAB] Jax | sgemm | operator={:.5f} s | linalg_matmul={:.5f} s".format(elapsed_operator, elapsed_matmul)) 
