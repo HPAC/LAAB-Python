@@ -1,32 +1,34 @@
-import torch
+import tensorflow as tf
 import os
 import time
 
-@torch.jit.script
+
+@tf.function
 def operator(A,B):
     ret = A@B
     return ret
 
-@torch.jit.script
+@tf.function
 def linalg_matmul(A,B):
-    ret = torch.linalg.matmul(A,B)
+    ret = tf.linalg.matmul(A,B)
     return ret
-
 
 if __name__ == "__main__":
 
-
-    #Sets the number of threads used for intraop parallelism on CPU.
+    exp_name = os.path.basename(__file__).split(".")[0]
+    
+    #Set threads
     THREADS = int(os.environ.get("OMP_NUM_THREADS", 1))
-    torch.set_num_threads(THREADS)
+    tf.config.threading.set_inter_op_parallelism_threads(THREADS)
+    tf.config.threading.set_intra_op_parallelism_threads(THREADS)
 
     #Problem size
     N = int(os.environ.get("LAAB_N", 3000))
     REPS = int(os.environ.get("LAAB_REPS", 3))
-    DTYPE = torch.float32
+    DTYPE = tf.float32
 
-    A = torch.tril(torch.randn([N, N], dtype=DTYPE))
-    B = torch.randn([N, N], dtype=DTYPE)
+    A =  tf.random.normal([N, N], dtype=DTYPE)
+    B =  tf.random.normal([N, N], dtype=DTYPE)
 
 
     for i in range(REPS):
@@ -36,13 +38,11 @@ if __name__ == "__main__":
         start = time.perf_counter()
         ret = operator(A,B)
         end = time.perf_counter()
-        elapsed_operator = end-start
+        elapsed_operator = end-start 
         
         start = time.perf_counter()
         ret = linalg_matmul(A,B)
         end = time.perf_counter()
         elapsed_matmul = end-start
         
-        print("[LAAB] PyTorch | mp_trmm | operator={:.5f} s | linalg_matmul={:.5f} s | ref_negative=R+sgemm".format(elapsed_operator, elapsed_matmul))  
-    
-
+        print("[LAAB] TensorFlow | {} | operator={:.5f} s | linalg_matmul={:.5f} s".format(exp_name, elapsed_operator, elapsed_matmul)) 

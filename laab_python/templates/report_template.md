@@ -11,7 +11,11 @@
 <!-- <hr style="border: none; height: 1px; background-color: #ccc;" /> -->
 
 
-## Test 1: Comparison with GEMM
+## Test 1: Matrix multiplications
+
+The execution times of matrix multiplications invoked through the high-level APIs of the frameworks are compared against those of an optimised reference implementation.
+
+a) **GEMM**:
 
 Operands: $A, B \in \mathbb{R}^{ {{exp_config.laab_n}} \times {{ exp_config.laab_n }} }$
 
@@ -20,12 +24,51 @@ Description: The time taken for general matrix multiplication $A^TB$ is compared
 
 ||Call  |  time (s)  | slowdown | loss | result@{{ cutoff }} | 
 |----|------|------------|--|---|--|
-|$A^TB$|`{{ config.sgemm.tests.operator }}`| {{ times.sgemm.tests.operator }} | {{ slow_down.sgemm.operator }} | {{ losses.sgemm.operator }}| {{ cutoff_results.sgemm.operator }} |
-|$"$|`{{ config.sgemm.tests.linalg_matmul }}` | {{ times.sgemm.tests.linalg_matmul }} |  {{ slow_down.sgemm.linalg_matmul }} | {{ losses.sgemm.linalg_matmul }} | {{ cutoff_results.sgemm.linalg_matmul }} |
-|**Ref (-)** |`sgemv for each row`| **{{ times.sgemm.ref_negative }}**| **{{ slow_down.sgemm.ref_negative }}** | | |
-|**Ref (+)** |`{{ config.sgemm.ref_positive }}`| **{{ times.sgemm.ref_positive }}**| - | | |
+|$A^TB$|`{{ config.mm_sgemm.tests.operator }}`| {{ times.mm_sgemm.tests.operator }} | {{ slow_down.mm_sgemm.operator }} | {{ losses.mm_sgemm.operator }}| {{ cutoff_results.mm_sgemm.operator }} |
+|$"$|`{{ config.mm_sgemm.tests.linalg_matmul }}` | {{ times.mm_sgemm.tests.linalg_matmul }} |  {{ slow_down.mm_sgemm.linalg_matmul }} | {{ losses.mm_sgemm.linalg_matmul }} | {{ cutoff_results.mm_sgemm.linalg_matmul }} |
+|**Ref (-)** |`sgemv for each row`| **{{ times.mm_sgemm.ref_negative }}**| **{{ slow_down.mm_sgemm.ref_negative }}** | | |
+|**Ref (+)** |`{{ config.mm_sgemm.ref_positive }}`| **{{ times.mm_sgemm.ref_positive }}**| - | | |
+
+b) **TRMM**
+
+Operands: $L, B \in \mathbb{R}^{ {{exp_config.laab_n}} \times {{ exp_config.laab_n }} }$
+
+Description: The input expression is $LB$, where $T$ is lower triangular. The reference implementation utilises the BLAS kernel `trmm`, which computes the matrix product with half the number of FLOPs than that required by `gemm`.
+
+|Expr|Call |  time (s)  | slowdown | loss | result@{{ cutoff }}|
+|----|-----|------------|--|--|--|
+|$LB$|`{{ config.mm_trmm.tests.operator }}`| {{ times.mm_trmm.tests.operator }} | {{ slow_down.mm_trmm.operator }} | {{ losses.mm_trmm.operator }} | {{ cutoff_results.mm_trmm.operator }} |
+|$"$|`{{ config.mm_trmm.tests.linalg_matmul }}`| {{ times.mm_trmm.tests.linalg_matmul }} |  {{ slow_down.mm_trmm.linalg_matmul }} | {{ losses.mm_trmm.linalg_matmul }}  | {{ cutoff_results.mm_trmm.linalg_matmul }} |
+|**Ref (-)** |`sgemm`| **{{ times.mm_trmm.ref_negative }}**| **{{ slow_down.mm_trmm.ref_negative }}** | | |
+|**Ref (+)** |`{{ config.mm_trmm.ref_positive }}`| **{{ times.mm_trmm.ref_positive }}**| - | | |
+
+c) **SYRK**
+
+Operands: $A \in \mathbb{R}^{ {{exp_config.laab_n}} \times {{ exp_config.laab_n }} }$
+
+Description: The input expression is $AA^T$. The reference implementation utilises the BLAS routine, `syrk` ("SYmmetric Rank-K update"), which computes the matrix product with only half the number of FLOPs than `gemm`.
+
+|Expr|Call |  time (s)  | slowdown | loss | result@{{ cutoff }}|
+|----|-----|------------|--|--|--|
+|$AA^{T}$|`{{ config.mm_syrk.tests.operator }}`| {{ times.mm_syrk.tests.operator }} | {{ slow_down.mm_syrk.operator }} | {{ losses.mm_syrk.operator }} | {{ cutoff_results.mm_syrk.operator }} |
+|$"$|`{{ config.mm_syrk.tests.linalg_matmul }}`| {{ times.mm_syrk.tests.linalg_matmul }} | {{ slow_down.mm_syrk.linalg_matmul }} | {{ losses.mm_syrk.linalg_matmul }}  | {{ cutoff_results.mm_syrk.linalg_matmul }} |
+|**Ref (-)** |`sgemm`| **{{ times.mm_syrk.ref_negative }}**| **{{ slow_down.mm_syrk.ref_negative }}** | | |
+|**Ref (+)** |`{{ config.mm_syrk.ref_positive }}`| **{{ times.mm_syrk.ref_positive }}**| - | | |
 
 
+d) **Tri-diagonal**
+
+Operands: $T, B \in \mathbb{R}^{ {{exp_config.laab_n}} \times {{ exp_config.laab_n }} }$
+
+Description: The input expression is $TB$, where $T$ is tri-diagonal. The reference implementation performs the matrix multiplication using the compressed sparse row format for $T$, implemented in C.
+
+|Expr|Call |  time (s)  | slowdown | loss | result@{{ cutoff }}|
+|----|-----|------------|--|--|--|
+|$TB$|`{{ config.mm_tridiag.tests.operator }}`| {{ times.mm_tridiag.tests.operator }} | {{ slow_down.mm_tridiag.operator }} |{{ losses.mm_tridiag.operator }} | {{ cutoff_results.mm_tridiag.operator }} |
+|$"$|`{{ config.mm_tridiag.tests.linalg_matmul }}`| {{ times.mm_tridiag.tests.linalg_matmul }} | {{ slow_down.mm_tridiag.linalg_matmul }} | {{ losses.mm_tridiag.linalg_matmul }}  | {{ cutoff_results.mm_tridiag.linalg_matmul }} | {% if config.mm_tridiag.tests.linalg_tridiagonal_matmul %}
+|$"$|`{{ config.mm_tridiag.tests.linalg_tridiagonal_matmul }}`| {{ times.mm_tridiag.tests.linalg_tridiagonal_matmul }} | {{ slow_down.mm_tridiag.linalg_tridiagonal_matmul }} | {{ losses.mm_tridiag.linalg_tridiagonal_matmul }}  | {{ cutoff_results.mm_tridiag.linalg_tridiagonal_matmul }} | {% endif %}
+|**Ref (-)** |`sgemm`| **{{ times.mm_tridiag.ref_negative }}**| **{{ slow_down.mm_tridiag.ref_negative }}** | | |
+|**Ref (+)** |`{{ config.mm_tridiag.ref_positive }}`| **{{ times.mm_tridiag.ref_positive }}**| - | | |
 
 ## Test 2: CSE
 
@@ -123,51 +166,7 @@ Description: The input matrix chain is $H^Tyx^TH$. Here, neither left-to-right n
 |**Ref (+)**| `{{ config.matchain_mixed.ref_positive }}`| **{{ times.matchain_mixed.ref_positive }}**| - | | |
 
 
-## Test 4: Matrix properties
-
-a) **TRMM**
-
-Operands: $A, B \in \mathbb{R}^{ {{exp_config.laab_n}} \times {{ exp_config.laab_n }} }$
-
-Description: The input expression is $AB$, where $A$ is lower triangular. The reference implementation utilises the BLAS kernel `trmm`, which computes the matrix product with half the number of FLOPs than that required by `gemm`.
-
-|Expr|Call |  time (s)  | slowdown | loss | result@{{ cutoff }}|
-|----|-----|------------|--|--|--|
-|$AB$|`{{ config.mp_trmm.tests.operator }}`| {{ times.mp_trmm.tests.operator }} | {{ slow_down.mp_trmm.operator }} | {{ losses.mp_trmm.operator }} | {{ cutoff_results.mp_trmm.operator }} |
-|$"$|`{{ config.mp_trmm.tests.linalg_matmul }}`| {{ times.mp_trmm.tests.linalg_matmul }} |  {{ slow_down.mp_trmm.linalg_matmul }} | {{ losses.mp_trmm.linalg_matmul }}  | {{ cutoff_results.mp_trmm.linalg_matmul }} |
-|**Ref (-)** |`sgemm`| **{{ times.mp_trmm.ref_negative }}**| **{{ slow_down.mp_trmm.ref_negative }}** | | |
-|**Ref (+)** |`{{ config.mp_trmm.ref_positive }}`| **{{ times.mp_trmm.ref_positive }}**| - | | |
-
-b) **SYRK**
-
-Operands: $A, B \in \mathbb{R}^{ {{exp_config.laab_n}} \times {{ exp_config.laab_n }} }$
-
-Description: The input expression is $AB$, where $A$ is transpose of  $B$. The reference implementation utilises the BLAS routine, `syrk` ("SYmmetric Rank-K update"), which computes the matrix product with only half the number of FLOPs than `gemm`.
-
-|Expr|Call |  time (s)  | slowdown | loss | result@{{ cutoff }}|
-|----|-----|------------|--|--|--|
-|$AB$|`{{ config.mp_syrk.tests.operator }}`| {{ times.mp_syrk.tests.operator }} | {{ slow_down.mp_syrk.operator }} | {{ losses.mp_syrk.operator }} | {{ cutoff_results.mp_syrk.operator }} |
-|$"$|`{{ config.mp_syrk.tests.linalg_matmul }}`| {{ times.mp_syrk.tests.linalg_matmul }} | {{ slow_down.mp_syrk.linalg_matmul }} | {{ losses.mp_syrk.linalg_matmul }}  | {{ cutoff_results.mp_syrk.linalg_matmul }} |
-|**Ref (-)** |`sgemm`| **{{ times.mp_syrk.ref_negative }}**| **{{ slow_down.mp_syrk.ref_negative }}** | | |
-|**Ref (+)** |`{{ config.mp_syrk.ref_positive }}`| **{{ times.mp_syrk.ref_positive }}**| - | | |
-
-
-c) **Tri-diagonal**
-
-Operands: $A, B \in \mathbb{R}^{ {{exp_config.laab_n}} \times {{ exp_config.laab_n }} }$
-
-Description: The input expression is $AB$, where $A$ is tri-diagonal. The reference implementation performs the matrix multiplication using the compressed sparse row format for $A$, implemented in C.
-
-|Expr|Call |  time (s)  | slowdown | loss | result@{{ cutoff }}|
-|----|-----|------------|--|--|--|
-|$AB$|`{{ config.mp_tridiag.tests.operator }}`| {{ times.mp_tridiag.tests.operator }} | {{ slow_down.mp_tridiag.operator }} |{{ losses.mp_tridiag.operator }} | {{ cutoff_results.mp_tridiag.operator }} |
-|$"$|`{{ config.mp_tridiag.tests.linalg_matmul }}`| {{ times.mp_tridiag.tests.linalg_matmul }} | {{ slow_down.mp_tridiag.linalg_matmul }} | {{ losses.mp_tridiag.linalg_matmul }}  | {{ cutoff_results.mp_tridiag.linalg_matmul }} | {% if config.mp_tridiag.tests.linalg_tridiagonal_matmul %}
-|$"$|`{{ config.mp_tridiag.tests.linalg_tridiagonal_matmul }}`| {{ times.mp_tridiag.tests.linalg_tridiagonal_matmul }} | {{ slow_down.mp_tridiag.linalg_tridiagonal_matmul }} | {{ losses.mp_tridiag.linalg_tridiagonal_matmul }}  | {{ cutoff_results.mp_tridiag.linalg_tridiagonal_matmul }} | {% endif %}
-|**Ref (-)** |`sgemm`| **{{ times.mp_tridiag.ref_negative }}**| **{{ slow_down.mp_tridiag.ref_negative }}** | | |
-|**Ref (+)** |`{{ config.mp_tridiag.ref_positive }}`| **{{ times.mp_tridiag.ref_positive }}**| - | | |
-
-
-## Test 5: Algebraic manipulations
+## Test 4: Expression rewrites
 
 a) **Distributivity 1**
 
@@ -197,7 +196,7 @@ c) **Blocked matrix**
 
 Operands: $A, B \in \mathbb{R}^{ {{exp_config.laab_n}} \times {{ exp_config.laab_n }} }$
 
-Description: The input expression is $AB$, where $A$ consists of two blocks along the diagnonal, each of size $ {{ exp_config.laab_n//2 }} \times {{ exp_config.laab_n//2 }} $.
+Description: The input expression is $AB$, where $A$ consists of two blocks $A_1$ and $A_2$ along the diagnonal, each of size $ {{ exp_config.laab_n//2 }} \times {{ exp_config.laab_n//2 }} $, and the remaining elements are zero. The result of the matrix multiplication $AB$ can be rewritten as $[(A_1B_1), (A_2B_2)]$, where $B_1, B_2$ are of sizes ${{ exp_config.laab_n//2 }} \times {{ exp_config.laab_n }}$. 
 
 |Expr|Call| time (s)| slowdown | loss | result@{{ cutoff }} |
 |----|---|----------|--|--|--|
@@ -207,7 +206,7 @@ Description: The input expression is $AB$, where $A$ consists of two blocks alon
 |**Ref (+)**|`{{ config.am_blocked.ref_positive }}`|**{{ times.am_blocked.ref_positive }}**| - | | |
 
 
-## Test 6: Code motion
+## Test 5: Code motion
 
 a) **Loop-invariant code motion**
 

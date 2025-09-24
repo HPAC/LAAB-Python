@@ -1,0 +1,10 @@
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) snicenvironment   2) systemdefault
+LAAB_REPS=10 LAAB_N=3000 LAAB_PREFIX='taskset -c 0' LD_BLAS=-lopenblas /usr/bin/make -C ../../C/ run
+./sgemm: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.34' not found (required by ./sgemm)
+make[1]: *** [Makefile:28: run] Error 1
+make: *** [Makefile:33: run_c] Error 2
+srun: error: b-cn1502: task 0: Exited with exit code 2
+REP=10 taskset -c 0 ./sgemm 3000 3000 3000

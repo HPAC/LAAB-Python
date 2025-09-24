@@ -8,7 +8,7 @@
 
 
 SCRIPTS = \
-	sgemm.py \
+	mm_sgemm.py \
 	cse_addition.py \
 	cse_matmul_paranthesis.py \
 	cse_matmul_no_paranthesis.py \
@@ -16,9 +16,9 @@ SCRIPTS = \
 	matchain_ltor.py \
 	matchain_rtol.py \
 	matchain_mixed.py \
-	mp_trmm.py \
-	mp_syrk.py \
-	mp_tridiag.py \
+	mm_trmm.py \
+	mm_syrk.py \
+	mm_tridiag.py \
 	am_distributivity1.py \
 	am_distributivity2.py \
 	am_blocked.py \

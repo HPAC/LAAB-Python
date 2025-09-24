@@ -17,6 +17,8 @@ def linalg_matmul(A):
 
 if __name__ == "__main__":
 
+    exp_name = os.path.basename(__file__).split(".")[0]
+    
     jax.config.update('jax_platform_name', 'cpu')
     
     #Problem size
@@ -47,6 +49,6 @@ if __name__ == "__main__":
         elapsed_matmul = end-start
         
         
-        print("[LAAB] Jax | mp_syrk | operator={:.5f} s | linalg_matmul={:.5f} s | ref_negative=R+sgemm".format(elapsed_operator, elapsed_matmul))  
+        print("[LAAB] Jax | {} | operator={:.5f} s | linalg_matmul={:.5f} s | ref_negative=R+mm_sgemm".format(exp_name, elapsed_operator, elapsed_matmul))  
     
 

@@ -4,10 +4,11 @@ import os
 import sys
 import subprocess
     
+#get root dir from environ
 git_root = repo_path = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'], text=True).strip()
 template_file = os.path.join(git_root, "laab_python/templates", "report_template.md")
 
-laab_results = LAABResults("data.txt", "PyTorch/2.1.2-foss-2023a", "HPC2N_x86_64")
+laab_results = LAABResults("data.txt", "Jax/0.4.25-gfbf-2023a", "HPC2N_x86_64")
 
 exp_config = {
     "laab_n":3000,

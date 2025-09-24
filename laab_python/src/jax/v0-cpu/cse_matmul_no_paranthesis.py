@@ -16,6 +16,8 @@ def ref_positive(A,B):
 
 if __name__ == "__main__":
 
+    exp_name = os.path.basename(__file__).split(".")[0]
+    
     jax.config.update('jax_platform_name', 'cpu')
     
     #Problem size
@@ -44,6 +46,6 @@ if __name__ == "__main__":
         elapsed_ref_negative = (3/2)*elapsed_ref_positive
 
 
-        print("[LAAB] Jax | cse_matmul_no_paranthesis | ref_positive={:.5f} s | operator={:.5f} s | ref_negative={:.5f} s".format(elapsed_ref_positive,
+        print("[LAAB] Jax | {} | ref_positive={:.5f} s | operator={:.5f} s | ref_negative={:.5f} s".format(exp_name, elapsed_ref_positive,
                                                                                                                                   elapsed_operator,
                                                                                                                                   elapsed_ref_negative))  

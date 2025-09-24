@@ -20,6 +20,8 @@ def linalg_matmul(A,B):
 
 if __name__ == "__main__":
     
+    exp_name = os.path.basename(__file__).split(".")[0]
+    
     jax.config.update('jax_platform_name', 'cpu')
     # print(jax.devices())
     # print(jax.default_backend())
@@ -50,4 +52,4 @@ if __name__ == "__main__":
         end = time.perf_counter()
         elapsed_matmul = end-start
         
-        print("[LAAB] Jax | sgemm | operator={:.5f} s | linalg_matmul={:.5f} s".format(elapsed_operator, elapsed_matmul)) 
+        print("[LAAB] Jax | {} | operator={:.5f} s | linalg_matmul={:.5f} s".format(exp_name, elapsed_operator, elapsed_matmul)) 

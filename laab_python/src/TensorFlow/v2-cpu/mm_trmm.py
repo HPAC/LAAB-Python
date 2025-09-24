@@ -15,7 +15,8 @@ def linalg_matmul(A,B):
 
 if __name__ == "__main__":
 
-    #Set threads
+    exp_name = os.path.basename(__file__).split(".")[0]
+    
     THREADS = int(os.environ.get("OMP_NUM_THREADS", 1))
     tf.config.threading.set_inter_op_parallelism_threads(THREADS)
     tf.config.threading.set_intra_op_parallelism_threads(THREADS)
@@ -25,8 +26,8 @@ if __name__ == "__main__":
     REPS = int(os.environ.get("LAAB_REPS", 3))
     DTYPE = tf.float32
 
-    A =  tf.random.normal([N, N], dtype=DTYPE)
-    B =  tf.random.normal([N, N], dtype=DTYPE)
+    A = tf.linalg.band_part(tf.random.normal([N, N], dtype=DTYPE),-1,0)
+    B = tf.random.normal([N, N], dtype=DTYPE)
 
 
     for i in range(REPS):
@@ -36,11 +37,13 @@ if __name__ == "__main__":
         start = time.perf_counter()
         ret = operator(A,B)
         end = time.perf_counter()
-        elapsed_operator = end-start 
+        elapsed_operator = end-start
         
         start = time.perf_counter()
         ret = linalg_matmul(A,B)
         end = time.perf_counter()
         elapsed_matmul = end-start
         
-        print("[LAAB] TensorFlow | sgemm | operator={:.5f} s | linalg_matmul={:.5f} s".format(elapsed_operator, elapsed_matmul)) 
+        print("[LAAB] TensorFlow | {} | operator={:.5f} s | linalg_matmul={:.5f} s | ref_negative=R+mm_sgemm".format(exp_name, elapsed_operator, elapsed_matmul))  
+    
+

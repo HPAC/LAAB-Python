@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
                          (end.tv_nsec - start.tv_nsec) / (double)BILLION;
 
         //printf("Time for cblas_sgemm: %.6f seconds\n", elapsed);
-        printf("[LAAB] C | sgemm | ref_positive=%.3f s\n", elapsed);
+        printf("[LAAB] C | mm_sgemm | ref_positive=%.3f s\n", elapsed);
     
     }
 

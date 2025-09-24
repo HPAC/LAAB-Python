@@ -1,6 +1,7 @@
-# LAAB_PREFIX = OMP_NUM_THREADS=58
+#LAAB_PREFIX = OMP_NUM_THREADS=58
 # LAAB_REPS = 5
 # LAAB_N = 3000
+# LD_BLAS = -lopenblas
 # LD_BLAS = -lmkl_rt
 
 

@@ -50,7 +50,8 @@ For each test, the $\texttt{slowdown}$ and $\texttt{loss}$ scores are reported. 
 
 ## The usage and example
 
-The usage is decribed [here](examples/README.md). An example evaluation report for the installation of PyTorch/2.1.2-foss-2023a on the HPC system Kebnekaise, hosted at Umea University in Sweden is available [here](examples/PyTorch/2.1.2-foss-2023a/HPC2N_x86_64/1xCore/amd_zen3/README.md).
+If you want to run the benchmark, refer [here](examples/README.md). If you just want to access the results, the evaluation reports from previously run benchmarks are available in the `reports/` directory. An example evaluation report for the installation of PyTorch/2.1.2-foss-2023a on the HPC system Kebnekaise, hosted at Umea University in Sweden is available [here](examples/PyTorch/2.1.2-foss-2023a/HPC2N_x86_64/1xCore/amd_zen3/README.md).
+
 
 ## Cite
 

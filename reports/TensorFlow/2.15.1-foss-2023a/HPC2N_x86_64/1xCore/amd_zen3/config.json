@@ -1,10 +1,32 @@
 {
-    "sgemm":{
+    "mm_sgemm":{
         "tests":{
             "operator": "transpose(A)@B",
-            "linalg_matmul": "linalg.matmul(t(A),B)"
+            "linalg_matmul": "linalg.matmul(transpose(A),B)"
         },
         "ref_positive": "sgemm"
+    },
+    "mm_trmm":{
+        "tests": {
+            "operator": "L@B",
+            "linalg_matmul": "linalg.matmul(L,B)"
+        },
+        "ref_positive": "trmm"
+    },
+    "mm_syrk":{
+        "tests": {
+            "operator": "A@transpose(A)",
+            "linalg_matmul": "linalg.matmul(A,transpose(A))"
+        },
+        "ref_positive": "syrk"
+    },
+    "mm_tridiag":{
+        "tests": {
+            "operator": "T@B",
+            "linalg_matmul": "linalg.matmul(T,B)",
+            "linalg_tridiagonal_matmul": "linalg.tridiagonal_matmul(T,B)"
+        },
+        "ref_positive": "csr(T)@B"
     },
     "cse_addition":{
         "tests":{
@@ -47,28 +69,6 @@
             "operator": "transpose(H)@y@transpose(x)@H"
         },
         "ref_positive": "(transpose(H)@y)@(transpose(x)@H)"
-    },
-    "mp_trmm":{
-        "tests": {
-            "operator": "A@B",
-            "linalg_matmul": "linalg.matmul(A,B)"
-        },
-        "ref_positive": "trmm"
-    },
-    "mp_syrk":{
-        "tests": {
-            "operator": "A@B",
-            "linalg_matmul": "linalg.matmul(A,B)"
-        },
-        "ref_positive": "syrk"
-    },
-    "mp_tridiag":{
-        "tests": {
-            "operator": "A@B",
-            "linalg_matmul": "linalg.matmul(A,B)",
-            "linalg_tridiagonal_matmul": "linalg.tridiagonal_matmul(A,B)"
-        },
-        "ref_positive": "csr(A)@B"
     },
     "am_distributivity1":{
         "tests": {

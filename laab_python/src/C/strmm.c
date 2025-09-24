@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
         double elapsed = (end.tv_sec - start.tv_sec) +
                          (end.tv_nsec - start.tv_nsec) / (double)BILLION;
 
-        printf("[LAAB] C | mp_trmm | ref_positive=%.3f s\n", elapsed);
+        printf("[LAAB] C | mm_trmm | ref_positive=%.3f s\n", elapsed);
     }
 
     free(A);

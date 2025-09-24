@@ -21,6 +21,8 @@ def ref_negative(A,B,y):
 
 if __name__ == "__main__":
 
+    exp_name = os.path.basename(__file__).split(".")[0]
+    
     #Set threads
     THREADS = int(os.environ.get("OMP_NUM_THREADS", 1))
     tf.config.threading.set_inter_op_parallelism_threads(THREADS)
@@ -56,6 +58,6 @@ if __name__ == "__main__":
         elapsed_ref_negative = end-start
 
 
-        print("[LAAB] TensorFlow | cse_suboptimal | ref_positive={:.5f} s | operator={:.5f} s | ref_negative={:.5f} s".format(elapsed_ref_positive, 
+        print("[LAAB] TensorFlow | {} | ref_positive={:.5f} s | operator={:.5f} s | ref_negative={:.5f} s".format(exp_name, elapsed_ref_positive, 
                                                                                                                               elapsed_operator,
                                                                                                                               elapsed_ref_negative))  
