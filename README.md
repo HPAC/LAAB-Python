@@ -4,7 +4,7 @@ Machine learning frameworks such as PyTorch, TensorFlow, and JAX are designed to
 
 Linear algebra operations, which are the building blocks of countless computational problems, often constitute major performance bottlenecks. The HPC community invests significant effort in developing architecture-specific optimised kernels, such as those provided by the BLAS and LAPACK libraries, to accelerate these operations. Thanks to high-level frameworks, users no longer need to engage in the error-prone and time-consuming process of directly invoking such kernels; instead, they can express computations using a high-level, mathematics-like syntax that closely mirrors textbook notation, without having to manage the low-level implementation details themselves. However, it is not guaranteed that these frameworks will automatically exploit knowledge of linear algebra to accelerate computations in the way expert-tuned implementations would.
 
-## The Benchmark suite
+## The benchmark suite
 
 This benchmark consists of five tests that evaluate the linear algebra awareness of high-level Python interfaces in a given installation of PyTorch, TensorFlow, and JAX.
 
@@ -20,7 +20,7 @@ This benchmark consists of five tests that evaluate the linear algebra awareness
 **Test 5: Code motion.** Some operations, when moved around, can result in improved performance. This test evaluates if the frameworks can identify loop-invariant code and partial operand accesses to improve performance.
 
 
-## The Evaluation procedure
+## The evaluation procedure
 
 Each test consists of one or more input expressions in a high level syntax. The execution times of each input expression (measured 10 times) are compared against those of an optimised reference implementation and the fraction by which the input expression is slower than the reference implmentation is computed as follows,
 
