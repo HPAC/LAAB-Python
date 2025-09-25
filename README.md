@@ -46,7 +46,7 @@ Therefore, for each input expression, we also consider a negative reference, whi
 <!-- $$
 \texttt{loss}(\mathbf{t}, \mathbf{t}^+, \mathbf{t}^-) = \frac{\texttt{slowdown}(\mathbf{t}, \mathbf{t}^+)}{\texttt{slowdown}(\mathbf{t}^-, \mathbf{t}^+)}
 $$ -->
-For each test, the $\texttt{slowdown}$ and $\texttt{loss}$ scores are reported. A test is considered pass if $\texttt{loss} \le 0.05$. For a given framework installation, the overall benchmark result include the mean $\texttt{loss}$ and the number of tests passed.
+For each input expression,, the $\texttt{slowdown}$ and $\texttt{loss}$ scores are reported,  and the expression is said to have passed the test if $\texttt{loss} \le 0.05$. For a given framework installation, the overall benchmark result include the mean $\texttt{loss}$ and the number of tests passed.
 
 
 <!-- If you are using this benchmark, please also cite the software, -->
