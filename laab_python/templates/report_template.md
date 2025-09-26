@@ -192,7 +192,19 @@ Description: The input expression is $E_2 = (A - H^TH)x$, which involves one $\m
 |**Ref (-)** |`no rewrite`| **{{ times.am_distributivity2.ref_negative }}**| **{{ slow_down.am_distributivity2.ref_negative }}** | | |
 |**Ref (+)**|`{{ config.am_distributivity2.ref_positive }}`|**{{ times.am_distributivity2.ref_positive }}**| - | | |
 
-c) **Blocked matrix**
+c) **Transpose law**
+
+Operands: $A, B \in \mathbb{R}^{ {{exp_config.laab_n}} \times {{ exp_config.laab_n }} }$
+
+Description: The input expression is $E_3 = B^TAA^TB$. This expression can be rewritten as $(A^TB)^T(A^TB)$ by applying the transpose law and the sub-expression $A^TB$ can be computed just once. 
+
+|Expr|Call| time (s)| slowdown | loss | result@{{ cutoff }} |
+|----|---|----------|--|--|--|
+|$E_3$|`{{ config.am_transpose.tests.operator }}`| {{ times.am_transpose.tests.operator }} | {{ slow_down.am_transpose.operator }} | {{ losses.am_transpose.operator }} | {{ cutoff_results.am_transpose.operator }} |
+|**Ref (-)** |`no rewrite`| **{{ times.am_transpose.ref_negative }}**| **{{ slow_down.am_transpose.ref_negative }}** | | |
+|**Ref (+)**|`{{ config.am_transpose.ref_positive }}`|**{{ times.am_transpose.ref_positive }}**| - | | |
+
+d) **Blocked matrix**
 
 Operands: $A, B \in \mathbb{R}^{ {{exp_config.laab_n}} \times {{ exp_config.laab_n }} }$
 

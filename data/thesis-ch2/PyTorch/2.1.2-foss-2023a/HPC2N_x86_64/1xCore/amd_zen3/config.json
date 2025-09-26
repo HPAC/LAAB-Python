@@ -1,10 +1,31 @@
 {
-    "sgemm":{
+    "mm_sgemm":{
         "tests":{
             "operator": "t(A)@B",
             "linalg_matmul": "linalg.matmul(t(A),B)"
         },
         "ref_positive": "sgemm"
+    },
+    "mm_trmm":{
+        "tests": {
+            "operator": "L@B",
+            "linalg_matmul": "linalg.matmul(L,B)"
+        },
+        "ref_positive": "trmm"
+    },
+    "mm_syrk":{
+        "tests": {
+            "operator": "A@t(A)",
+            "linalg_matmul": "linalg.matmul(A,t(A))"
+        },
+        "ref_positive": "syrk"
+    },
+    "mm_tridiag":{
+        "tests": {
+            "operator": "T@B",
+            "linalg_matmul": "linalg.matmul(T,B)"
+        },
+        "ref_positive": "csr(T)@B"
     },
     "cse_addition":{
         "tests":{
@@ -51,27 +72,6 @@
         },
         "ref_positive": "(t(H)@y)@(t(x)@H)"
     },
-    "mp_trmm":{
-        "tests": {
-            "operator": "A@B",
-            "linalg_matmul": "linalg.matmul(A,B)"
-        },
-        "ref_positive": "trmm"
-    },
-    "mp_syrk":{
-        "tests": {
-            "operator": "A@B",
-            "linalg_matmul": "linalg.matmul(A,B)"
-        },
-        "ref_positive": "syrk"
-    },
-    "mp_tridiag":{
-        "tests": {
-            "operator": "A@B",
-            "linalg_matmul": "linalg.matmul(A,B)"
-        },
-        "ref_positive": "csr(A)@B"
-    },
     "am_distributivity1":{
         "tests": {
             "operator": "A@B+ A@C"
@@ -90,6 +90,12 @@
             "linalg_matmul": "linalg.matmul(A,B)"
         },
         "ref_positive": "blocked matrix multiply"
+    },
+    "am_transpose":{
+        "tests": {
+            "operator": "t(B)@A@t(A)@B"
+        },
+        "ref_positive": "S = t(A)@B; t(S)@S"
     },
     "cm_loops":{
         "tests": {

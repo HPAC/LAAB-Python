@@ -89,6 +89,12 @@
         },
         "ref_positive": "blocked matrix multiply"
     },
+    "am_transpose":{
+        "tests": {
+            "operator": "transpose(B)@A@transpose(A)@B"
+        },
+        "ref_positive": "S = transpose(A)@B; transpose(S)@S"
+    },
     "cm_loops":{
         "tests": {
             "operator": "for i in range(3): A@B ..."

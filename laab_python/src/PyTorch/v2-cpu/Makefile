@@ -22,6 +22,7 @@ SCRIPTS = \
 	am_distributivity1.py \
 	am_distributivity2.py \
 	am_blocked.py \
+	am_transpose.py \
 	cm_loops.py \
 	cm_partial_op_sum.py \
 	cm_partial_op_prod.py \
