@@ -203,18 +203,6 @@ Description: The input expression is $E_3 = B^TAA^TB$. This expression can be re
 |**Ref (-)** |`no rewrite`| **1.534**| **0.503** | | |
 |**Ref (+)**|`S = t(A)@B; t(S)@S`|**1.021**| - | | |
 
-d) **Blocked matrix**
-
-Operands: $A, B \in \mathbb{R}^{ 3000 \times 3000 }$
-
-Description: The input expression is $AB$, where $A$ consists of two blocks $A_1$ and $A_2$ along the diagnonal, each of size $ 1500 \times 1500 $, and the remaining elements are zero. The result of the matrix multiplication $AB$ can be rewritten as $[(A_1B_1), (A_2B_2)]$, where $B_1, B_2$ are of sizes $1500 \times 3000$. 
-
-|Expr|Call| time (s)| slowdown | loss | result@0.05 |
-|----|---|----------|--|--|--|
-|$AB$|`A@B`| 0.509 | 0.903 | 1.059 | :x: |
-|$"$|`linalg.matmul(A,B)` | 0.509 | 0.904 | 1.06 | :x: |
-|**Ref (-)** |`no rewrite`| **0.496**| **0.852** | | |
-|**Ref (+)**|`blocked matrix multiply`|**0.268**| - | | |
 
 
 ## Test 5: Code motion
@@ -258,8 +246,8 @@ Description: The input expression is $(AB)[2,2]$, which requires only single ele
 
 ## OVERALL RESULT
 
-### Mean loss: 0.656 
+### Mean loss: 0.632 
 
-### Score: 7 / 18
+### Score: 7 / 17
 
 <hr style="border: none; height: 1px; background-color: #ccc;" />
