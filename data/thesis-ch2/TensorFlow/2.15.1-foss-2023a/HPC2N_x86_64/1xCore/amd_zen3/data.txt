@@ -262,17 +262,6 @@ LAAB_REPS=10 LAAB_N=3000  python am_transpose.py
 [LAAB] TensorFlow | am_transpose | ref_positive=1.06057 s | operator=1.63522 s | ref_negative=1.59150 s
 [LAAB] TensorFlow | am_transpose | ref_positive=1.06230 s | operator=1.59183 s | ref_negative=1.59295 s
 [LAAB] TensorFlow | am_transpose | ref_positive=1.06095 s | operator=1.59122 s | ref_negative=1.63664 s
-LAAB_REPS=10 LAAB_N=3000  python am_blocked.py 
-[LAAB] TensorFlow | am_blocked | ref_positive=0.33138 s | operator=0.56387 s  | linalg_matmul=0.56137 s | ref_negative=0.52645 s
-[LAAB] TensorFlow | am_blocked | ref_positive=0.28709 s | operator=0.52337 s  | linalg_matmul=0.54528 s | ref_negative=0.52307 s
-[LAAB] TensorFlow | am_blocked | ref_positive=0.27357 s | operator=0.52366 s  | linalg_matmul=0.52406 s | ref_negative=0.52751 s
-[LAAB] TensorFlow | am_blocked | ref_positive=0.29184 s | operator=0.52391 s  | linalg_matmul=0.52405 s | ref_negative=0.51486 s
-[LAAB] TensorFlow | am_blocked | ref_positive=0.27338 s | operator=0.54449 s  | linalg_matmul=0.53407 s | ref_negative=0.52529 s
-[LAAB] TensorFlow | am_blocked | ref_positive=0.28129 s | operator=0.52340 s  | linalg_matmul=0.52373 s | ref_negative=0.52248 s
-[LAAB] TensorFlow | am_blocked | ref_positive=0.28887 s | operator=0.52305 s  | linalg_matmul=0.52366 s | ref_negative=0.51456 s
-[LAAB] TensorFlow | am_blocked | ref_positive=0.28304 s | operator=0.52402 s  | linalg_matmul=0.52375 s | ref_negative=0.55298 s
-[LAAB] TensorFlow | am_blocked | ref_positive=0.28083 s | operator=0.52490 s  | linalg_matmul=0.52348 s | ref_negative=0.55145 s
-[LAAB] TensorFlow | am_blocked | ref_positive=0.26688 s | operator=0.52398 s  | linalg_matmul=0.52434 s | ref_negative=0.50882 s
 LAAB_REPS=10 LAAB_N=3000  python cm_loops.py 
 [LAAB] TensorFlow | cm_loops | ref_positive=0.66916 s | operator=0.66039 s | ref_negative=2.00747 s
 [LAAB] TensorFlow | cm_loops | ref_positive=0.58387 s | operator=0.59054 s | ref_negative=1.75162 s

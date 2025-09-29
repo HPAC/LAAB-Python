@@ -84,13 +84,6 @@
         },
         "ref_positive": "A@x - transpose(H)@(H@x)"
     },
-    "am_blocked":{
-        "tests": {
-            "operator": "A@B",
-            "linalg_matmul": "jax.numpy.matmul(A,B)"
-        },
-        "ref_positive": "blocked matrix multiply"
-    },
     "am_transpose":{
         "tests": {
             "operator": "transpose(B)@A@transpose(A)@B"

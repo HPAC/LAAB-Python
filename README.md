@@ -15,7 +15,7 @@ This benchmark consists of several test expressions categorised into the followi
 
 **Test-set 3: Matrix chains.** Given $m$ matrices of suitable sizes, the product $M = A_1A_2...A_n$ is known as a matrix chain. Because of associativity of matrix product, matrix chain can be computed in many different ways, each identified by a specific paranthesisation. The different parenthesisations may vary in the number of FLOP counts and performance. This test evaluates the performance of a set of input matrix chain expressions against reference implementations that use the optimal parenthesisation.
 
-**Test-set 4: Expression rewrites.** Algebraic properties can be used to rewrite an expression in several alternative ways that can result in accelerated evaluations. For example, the expression $AB +AB$ can be rewritten as $A(B+C)$, reducing the number of matrix–matrix multiplications from two to one. This test evaluates rewrites based on the distributive law, transpose law and blocked matrix multiplications.
+**Test-set 4: Expression rewrites.** Algebraic properties can be used to rewrite an expression in several alternative ways that can result in accelerated evaluations. For example, the expression $AB +AB$ can be rewritten as $A(B+C)$, reducing the number of matrix–matrix multiplications from two to one. This test evaluates rewrites based on the distributive and transpose law.
 
 **Test-set 5: Code motion.** Some operations, when moved around, can result in improved performance. This test evaluates if the frameworks can identify loop-invariant code and partial operand accesses to improve performance.
 

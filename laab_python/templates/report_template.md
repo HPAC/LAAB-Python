@@ -204,18 +204,6 @@ Description: The input expression is $E_3 = B^TAA^TB$. This expression can be re
 |**Ref (-)** |`no rewrite`| **{{ times.am_transpose.ref_negative }}**| **{{ slow_down.am_transpose.ref_negative }}** | | |
 |**Ref (+)**|`{{ config.am_transpose.ref_positive }}`|**{{ times.am_transpose.ref_positive }}**| - | | |
 
-d) **Blocked matrix**
-
-Operands: $A, B \in \mathbb{R}^{ {{exp_config.laab_n}} \times {{ exp_config.laab_n }} }$
-
-Description: The input expression is $AB$, where $A$ consists of two blocks $A_1$ and $A_2$ along the diagnonal, each of size $ {{ exp_config.laab_n//2 }} \times {{ exp_config.laab_n//2 }} $, and the remaining elements are zero. The result of the matrix multiplication $AB$ can be rewritten as $[(A_1B_1), (A_2B_2)]$, where $B_1, B_2$ are of sizes ${{ exp_config.laab_n//2 }} \times {{ exp_config.laab_n }}$. 
-
-|Expr|Call| time (s)| slowdown | loss | result@{{ cutoff }} |
-|----|---|----------|--|--|--|
-|$AB$|`{{ config.am_blocked.tests.operator }}`| {{ times.am_blocked.tests.operator }} | {{ slow_down.am_blocked.operator }} | {{ losses.am_blocked.operator }} | {{ cutoff_results.am_blocked.operator }} |
-|$"$|`{{ config.am_blocked.tests.linalg_matmul }}` | {{ times.am_blocked.tests.linalg_matmul }} | {{ slow_down.am_blocked.linalg_matmul }} | {{ losses.am_blocked.linalg_matmul }} | {{ cutoff_results.am_blocked.linalg_matmul }} |
-|**Ref (-)** |`no rewrite`| **{{ times.am_blocked.ref_negative }}**| **{{ slow_down.am_blocked.ref_negative }}** | | |
-|**Ref (+)**|`{{ config.am_blocked.ref_positive }}`|**{{ times.am_blocked.ref_positive }}**| - | | |
 
 
 ## Test 5: Code motion

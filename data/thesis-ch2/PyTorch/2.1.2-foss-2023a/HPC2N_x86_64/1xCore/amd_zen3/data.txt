@@ -252,17 +252,6 @@ LAAB_REPS=10 LAAB_N=3000  python am_distributivity2.py
 [LAAB] PyTorch | am_distributivity2 | ref_positive=0.00901 s | operator=0.53394 s | ref_negative=0.53442 s
 [LAAB] PyTorch | am_distributivity2 | ref_positive=0.00947 s | operator=0.53085 s | ref_negative=0.53385 s
 [LAAB] PyTorch | am_distributivity2 | ref_positive=0.00903 s | operator=0.53116 s | ref_negative=0.53360 s
-LAAB_REPS=10 LAAB_N=3000  python am_blocked.py 
-[LAAB] PyTorch | am_blocked | ref_positive=0.28191 s | operator=0.51129 s  | linalg_matmul=0.51118 s | ref_negative=0.51635 s
-[LAAB] PyTorch | am_blocked | ref_positive=0.27514 s | operator=0.50980 s  | linalg_matmul=0.51408 s | ref_negative=0.50937 s
-[LAAB] PyTorch | am_blocked | ref_positive=0.28581 s | operator=0.50937 s  | linalg_matmul=0.50944 s | ref_negative=0.50911 s
-[LAAB] PyTorch | am_blocked | ref_positive=0.28594 s | operator=0.51350 s  | linalg_matmul=0.50958 s | ref_negative=0.49595 s
-[LAAB] PyTorch | am_blocked | ref_positive=0.26766 s | operator=0.51206 s  | linalg_matmul=0.50991 s | ref_negative=0.51423 s
-[LAAB] PyTorch | am_blocked | ref_positive=0.26830 s | operator=0.50931 s  | linalg_matmul=0.51406 s | ref_negative=0.50977 s
-[LAAB] PyTorch | am_blocked | ref_positive=0.28653 s | operator=0.50944 s  | linalg_matmul=0.50948 s | ref_negative=0.49569 s
-[LAAB] PyTorch | am_blocked | ref_positive=0.26761 s | operator=0.51175 s  | linalg_matmul=0.50959 s | ref_negative=0.51406 s
-[LAAB] PyTorch | am_blocked | ref_positive=0.26779 s | operator=0.50924 s  | linalg_matmul=0.51413 s | ref_negative=0.51455 s
-[LAAB] PyTorch | am_blocked | ref_positive=0.27458 s | operator=0.50940 s  | linalg_matmul=0.51418 s | ref_negative=0.50888 s
 LAAB_REPS=10 LAAB_N=3000  python am_transpose.py 
 [LAAB] PyTorch | am_transpose | ref_positive=1.04574 s | operator=1.53566 s | ref_negative=1.53796 s
 [LAAB] PyTorch | am_transpose | ref_positive=1.02192 s | operator=1.53989 s | ref_negative=1.53535 s

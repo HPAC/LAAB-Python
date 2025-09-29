@@ -262,17 +262,6 @@ LAAB_REPS=10 LAAB_N=3000 taskset -c 0 python am_transpose.py
 [LAAB] Jax | am_transpose | ref_positive=1.01493 s | operator=1.50638 s | ref_negative=1.50678 s
 [LAAB] Jax | am_transpose | ref_positive=1.03328 s | operator=1.50624 s | ref_negative=1.52795 s
 [LAAB] Jax | am_transpose | ref_positive=1.01506 s | operator=1.50760 s | ref_negative=1.50722 s
-LAAB_REPS=10 LAAB_N=3000 taskset -c 0 python am_blocked.py 
-[LAAB] Jax | am_blocked | ref_positive=0.31694 s | operator=0.54799 s  | linalg_matmul=0.57470 s | ref_negative=0.55665 s
-[LAAB] Jax | am_blocked | ref_positive=0.28513 s | operator=0.50920 s  | linalg_matmul=0.50975 s | ref_negative=0.50902 s
-[LAAB] Jax | am_blocked | ref_positive=0.29563 s | operator=0.52739 s  | linalg_matmul=0.51094 s | ref_negative=0.52481 s
-[LAAB] Jax | am_blocked | ref_positive=0.30308 s | operator=0.50925 s  | linalg_matmul=0.50946 s | ref_negative=0.50910 s
-[LAAB] Jax | am_blocked | ref_positive=0.28719 s | operator=0.50914 s  | linalg_matmul=0.52757 s | ref_negative=0.51786 s
-[LAAB] Jax | am_blocked | ref_positive=0.29911 s | operator=0.50923 s  | linalg_matmul=0.50963 s | ref_negative=0.50901 s
-[LAAB] Jax | am_blocked | ref_positive=0.28410 s | operator=0.50931 s  | linalg_matmul=0.50969 s | ref_negative=0.52922 s
-[LAAB] Jax | am_blocked | ref_positive=0.28514 s | operator=0.50945 s  | linalg_matmul=0.50970 s | ref_negative=0.50885 s
-[LAAB] Jax | am_blocked | ref_positive=0.29562 s | operator=0.52465 s  | linalg_matmul=0.51365 s | ref_negative=0.50859 s
-[LAAB] Jax | am_blocked | ref_positive=0.28624 s | operator=0.50919 s  | linalg_matmul=0.50964 s | ref_negative=0.52319 s
 LAAB_REPS=10 LAAB_N=3000 taskset -c 0 python cm_loops.py 
 [LAAB] Jax | cm_loops | ref_positive=0.61882 s | operator=0.57686 s | ref_negative=1.85646 s
 [LAAB] Jax | cm_loops | ref_positive=0.52836 s | operator=0.53415 s | ref_negative=1.58508 s
