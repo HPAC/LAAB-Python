@@ -1,5 +1,5 @@
 from laab_python.laab_results import LAABResults
-from laab_python.prepare_report import prepare_markdown_report
+from laab_python.prepare_report import prepare_markdown_report, dump_results_pickle
 import os
 import sys
 import subprocess
@@ -16,6 +16,9 @@ exp_config = {
     "name": "1xCPU-Core",
     "omp_num_threads": 1
 }
+
+pickle_path = "results.pkl"
+dump_results_pickle(laab_results, exp_config, pickle_path, cutoff=0.05)
 
 prepare_markdown_report(laab_results, 'config.json', exp_config, template_file, "README.md", cutoff=0.05)
     

@@ -3,6 +3,7 @@ import sys
 import statistics
 from jinja2 import Template
 import json
+import pickle
 from .laab_results import LAABResults
 
 def format_floats_recursive(data: dict, precision: int = 2) -> dict:
@@ -27,6 +28,39 @@ def format_cutoff_results_md(cutoff_results):
             else:
                 cutoff_results[exp][test] = ":x:"
     return cutoff_results
+
+
+def dump_results_pickle(laab_results, exp_config, pickle_path, cutoff=0.05):
+    min_exec_times = laab_results.get_min_test_times()
+    laab_results.compute_loss()
+    losses = laab_results.loss
+    mean_loss = laab_results.mean_loss
+    ret = laab_results.apply_cutoff(cutoff=cutoff)
+    cutoff_results = ret.results
+    score = ret.score
+    
+    prec=3
+    data = {
+        "eb_name": laab_results.eb_version,
+        "system": laab_results.system,
+        "cpu_model": laab_results.cpu_model,
+        "losses": format_floats_recursive(losses,prec),
+        "slow_down": format_floats_recursive(laab_results.slow_down,prec),
+        "mean_loss": f"{mean_loss:.{prec}f}",
+        "cutoff_results": format_cutoff_results_md(cutoff_results),
+        "score": score,
+        "num_tests": len(losses),
+        "times": format_floats_recursive(min_exec_times,prec),
+        "cutoff": f"{cutoff:.2f}",
+        "exp_config": exp_config
+    }
+    
+    #dump to pickle
+    with open(pickle_path, "wb") as f:
+        pickle.dump(data, f)
+    print(f"Results dumped to {pickle_path}")
+
+    
 
 def prepare_markdown_report(laab_results, src_config_file, exp_config, template_file, outfile, cutoff=0.05):
     

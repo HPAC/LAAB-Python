@@ -3,6 +3,7 @@ from laab_python.prepare_report import prepare_markdown_report
 import os
 import sys
 import subprocess
+import pickle 
     
 #get root dir from environ
 git_root = repo_path = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'], text=True).strip()
@@ -16,6 +17,7 @@ exp_config = {
     "name": "1xCPU-Core",
     "omp_num_threads": 1
 }
+
 
 prepare_markdown_report(laab_results, 'config.json', exp_config, template_file, "README.md", cutoff=0.05)
     
