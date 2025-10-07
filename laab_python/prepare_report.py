@@ -30,7 +30,17 @@ def format_cutoff_results_md(cutoff_results):
     return cutoff_results
 
 
-def dump_results_pickle(laab_results, exp_config, pickle_path, cutoff=0.05):
+def dump_results_pickle(laab_results, src_config_file, exp_config, pickle_path, cutoff=0.05):
+    
+    if not os.path.exists(src_config_file):
+        raise FileNotFoundError(f"Config file {src_config_file} not found")
+    config = json.load(open(src_config_file, "r"))
+
+    if set(laab_results.data.keys()) != set(config.keys()):
+        missing = set(config.keys()) - set(laab_results.data.keys())
+        print("Missing experiments in data file:", missing)
+        raise ValueError("Experiments in data file and config file do not match")
+    
     min_exec_times = laab_results.get_min_test_times()
     laab_results.compute_loss()
     losses = laab_results.loss
@@ -52,6 +62,7 @@ def dump_results_pickle(laab_results, exp_config, pickle_path, cutoff=0.05):
         "num_tests": len(losses),
         "times": format_floats_recursive(min_exec_times,prec),
         "cutoff": f"{cutoff:.2f}",
+        "config": config,
         "exp_config": exp_config
     }
     

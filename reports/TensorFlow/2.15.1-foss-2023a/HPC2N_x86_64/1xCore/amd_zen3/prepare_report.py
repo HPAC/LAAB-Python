@@ -5,7 +5,7 @@ import sys
 import subprocess
     
 #get root dir from environ
-git_root = repo_path = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'], text=True).strip()
+git_root  = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'], text=True).strip()
 template_file = os.path.join(git_root, "laab_python/templates", "report_template.md")
 
 laab_results = LAABResults("data.txt", "TensorFlow/2.15.1-foss-2023a", "HPC2N_x86_64")
@@ -18,7 +18,7 @@ exp_config = {
 }
 
 pickle_path = "results.pkl"
-dump_results_pickle(laab_results, exp_config, pickle_path, cutoff=0.05)
+dump_results_pickle(laab_results, 'config.json', exp_config, pickle_path, cutoff=0.05)
 
 prepare_markdown_report(laab_results, 'config.json', exp_config, template_file, "README.md", cutoff=0.05)
     
