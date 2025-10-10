@@ -87,7 +87,9 @@ class LAABResults:
                 if self.slow_down[exp]['ref_negative'] > 0.0:
                     self.loss[exp][test] = self.slow_down[exp][test]/self.slow_down[exp]['ref_negative']
             
-            _loss_vals.append(np.min(list(self.loss[exp].values())))
+            min_loss = np.min(list(self.loss[exp].values()))
+            self.loss[exp]["result"] = min_loss
+            _loss_vals.append(min_loss)
             
         self.mean_loss = np.mean(_loss_vals)
                 

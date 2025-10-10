@@ -72,59 +72,26 @@ def dump_results_pickle(laab_results, src_config_file, exp_config, pickle_path, 
     print(f"Results dumped to {pickle_path}")
 
     
-
-def prepare_markdown_report(laab_results, src_config_file, exp_config, template_file, outfile, cutoff=0.05):
-    
-    if not os.path.exists(src_config_file):
-        raise FileNotFoundError(f"Config file {src_config_file} not found")
-    config = json.load(open(src_config_file, "r"))
-
-    if set(laab_results.data.keys()) != set(config.keys()):
-        missing = set(config.keys()) - set(laab_results.data.keys())
-        print("Missing experiments in data file:", missing)
-        raise ValueError("Experiments in data file and config file do not match")
-    
+def prepare_markdown_report(results_pkl, template_file, outfile):
+    if not os.path.exists(results_pkl):
+        raise FileNotFoundError(f"Pickle file {results_pkl} not found")
     
     if not os.path.exists(template_file):
         raise FileNotFoundError(f"Template file {template_file} not found")
     
-    min_exec_times = laab_results.get_min_test_times()
-    laab_results.compute_loss()
-    
-    losses = laab_results.loss
-    mean_loss = laab_results.mean_loss
-    
-    
-    ret = laab_results.apply_cutoff(cutoff=cutoff)
-    cutoff_results = ret.results
-    score = ret.score
-    
-    prec=3
-    
-    inject = {
-        "eb_name": laab_results.eb_version,
-        "system": laab_results.system,
-        "cpu_model": laab_results.cpu_model,
-        "losses": format_floats_recursive(losses,prec),
-        "slow_down": format_floats_recursive(laab_results.slow_down,prec),
-        "mean_loss": f"{mean_loss:.{prec}f}",
-        "cutoff_results": format_cutoff_results_md(cutoff_results),
-        "score": score,
-        "num_tests": len(losses),
-        "times": format_floats_recursive(min_exec_times,prec),
-        "cutoff": f"{cutoff:.2f}",
-        "config": config,
-        "exp_config": exp_config
-    }
-    
+    with open(results_pkl, "rb") as f:
+        data = pickle.load(f)
+        
     with open(template_file, "r") as f:
         template_content = f.read()
         template = Template(template_content)
-        report = template.render(**inject)
-    
+        report = template.render(**data)
+        
     with open(outfile, "w") as f:
         f.write(report)
     print(f"Report written to {outfile}")
+    
+
     
 
     

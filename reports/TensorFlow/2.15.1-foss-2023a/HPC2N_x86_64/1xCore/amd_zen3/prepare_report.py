@@ -19,6 +19,5 @@ exp_config = {
 
 pickle_path = "results.pkl"
 dump_results_pickle(laab_results, 'config.json', exp_config, pickle_path, cutoff=0.05)
-
-prepare_markdown_report(laab_results, 'config.json', exp_config, template_file, "README.md", cutoff=0.05)
+prepare_markdown_report(pickle_path, template_file, "README.md")
     
